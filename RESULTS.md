@@ -11,12 +11,17 @@ treatment decisions.
 
 ## The short version
 
-A Random Forest predicting rifampicin resistance from TB genomes scores
-**0.958 AUC** under the evaluation protocol most commonly reported, and
-**0.686** when tested on a country it was not trained on. The gap is not noise:
-the confidence intervals do not overlap. Most of the headline figure is an
-artefact of how the data is split, not evidence that the model would work on a
-new patient in a new place.
+Across four drugs, a random split **grouped by isolate** overstates performance
+by **0.05 to 0.15 AUC** compared with a split grouped by study, with
+non-overlapping confidence intervals every time. Rifampicin reads 0.958 the
+first way and 0.908 the second. Published TB benchmarks are normally reported
+the first way.
+
+Beyond that, **rifampicin alone** degrades further on an unseen country
+(0.69–0.76). The other three drugs do not: isoniazid scores 0.936 on held-out
+Canada against 0.855 within-cohort. An earlier draft of this document
+generalised the rifampicin result to all drugs; that was wrong and §2 now gives
+every country result with its interval.
 
 Adding clinical and geographic features — the original planned contribution —
 **cannot be evaluated on this cohort at all**. Every study in it is confined to
@@ -108,53 +113,73 @@ explanation for the generalisation failure in §4.
 ## 2. The evaluation ladder
 
 The same model and the same features, evaluated three ways. Only the split
-changes. Rifampicin, 814 binary variant features, 300 trees, threshold 0.50
-fixed in advance, 2,000-resample bootstrap for intervals.
+changes. 814 binary variant features, 300 trees, threshold 0.50 fixed in
+advance, 2,000-resample paired bootstrap for every interval.
 
-| Evaluation | Held out | Baseline AUC | 95% interval |
+### Rung 1 to 2: grouping by study, not by isolate
+
+This is the robust result. It holds for all four drugs, and no interval
+overlaps its partner.
+
+| Drug | Grouped by **isolate** | Grouped by **study** | Cost |
 |---|---|---|---|
-| Random split, grouped by **isolate** | 525 | **0.958** | [0.942, 0.973] |
-| Random split, grouped by **study** | 701 | **0.908** | [0.885, 0.931] |
-| Held-out country: United Kingdom | 93 | **0.758** | [0.620, 0.870] |
-| Held-out country: Malawi | 169 | **0.761** | [0.432, 1.000] |
-| Held-out country: Canada | 178 | **0.686** | [0.565, 0.799] |
+| Rifampicin | 0.958 [0.942, 0.973] | 0.908 [0.885, 0.931] | &minus;0.050 |
+| Isoniazid | 0.947 [0.928, 0.964] | 0.855 [0.822, 0.887] | &minus;0.092 |
+| Ethambutol | 0.913 [0.885, 0.939] | 0.765 [0.723, 0.803] | &minus;0.148 |
+| Pyrazinamide | 0.911 [0.877, 0.940] | 0.782 [0.746, 0.819] | &minus;0.129 |
 
-The same collapse happens for every drug tested:
+These 9,842 genomes come from **958 different studies**. Grouping by isolate
+lets samples from one study sit on both sides of the split, and each study has
+its own sampling frame and resistance prevalence, so the model can partly infer
+the answer from recognising the cohort. Grouping by study removes that, at a
+cost of 0.05 to 0.15 AUC depending on the drug.
 
-| Drug | By isolate | By study | Held-out countries |
-|---|---|---|---|
-| Rifampicin | 0.958 | 0.908 | 0.686 &ndash; 0.761 |
-| Isoniazid | 0.947 | 0.855 | not run |
-| Ethambutol | 0.913 | 0.765 | 0.628 &ndash; 0.843 |
-| Pyrazinamide | 0.911 | 0.782 | 0.632 &ndash; 0.837 |
-
-Four drugs, same pattern, no exceptions.
-
-**Row 1 is the number this project set out to reproduce, and it does** — the
+**Column 1 is the number this project set out to reproduce, and it does** — the
 brief cited ~0.97 for rifampicin and ~0.95 for isoniazid, and these runs give
 0.958 and 0.947 on independently recovered labels. That is a genuine
-replication, since the brief's source for those figures was never verifiable.
+replication. It is also the most optimistic protocol of the three.
 
-**Rows 2 to 5 are why that number should not be quoted on its own.**
+### Rung 3: holding out a whole country
 
-### Why each rung drops
+Here the picture is **not** uniform, and an earlier version of this document
+overstated it by generalising from rifampicin. The full results:
 
-*Isolate to study (−0.05).* These 9,842 genomes come from **958 different
-studies**. Grouping by isolate lets samples from one study sit on both sides of
-the split. Each study has its own sampling frame and its own resistance
-prevalence, so the model can partly infer the answer from recognising the
-cohort. Grouping by study removes that.
+| Drug | By study | Held-out country results (95% interval) |
+|---|---|---|
+| Rifampicin | 0.908 | Canada 0.686 [0.565, 0.799] · UK 0.758 [0.620, 0.870] · Malawi 0.761 [0.432, 1.000] |
+| Isoniazid | 0.855 | **Canada 0.936** [0.891, 0.972] · **Malawi 0.904** [0.857, 0.947] · S. Africa 0.795 [0.526, 0.997] · UK 0.773 [0.673, 0.862] |
+| Ethambutol | 0.765 | **UK 0.843** [0.729, 0.936] · Canada 0.739 [0.598, 0.868] · S. Africa 0.628 [0.500, 0.754] |
+| Pyrazinamide | 0.782 | **Canada 0.837** [0.731, 0.932] · S. Africa 0.632 [0.396, 0.860] · UK 0.644 [0.478, 0.805] |
 
-*Study to held-out country (−0.2 further).* TB strains cluster into lineages and
-outbreaks. Even across studies, a test isolate often has close genetic relatives
-in training. Holding out a whole country removes most of that shared population
-structure, and performance falls to 0.69–0.76 across three independent
-countries. Sensitivity on Canada is 0.559 — barely better than chance on
-precisely the cases where a miss harms a patient.
+Bold entries score **above** their study-grouped figure. Only rifampicin drops
+on every held-out country; for the other three drugs the results straddle the
+study-grouped value, and 6 of the 14 country results beat it.
 
-South Africa could not be evaluated: 107 of its 110 labelled isolates are
-resistant, so an AUC there would be meaningless. That is reported rather than
-quietly dropped.
+Read honestly:
+
+- **Rifampicin genuinely degrades across geography.** All three countries fall
+  below 0.908, and Canada's interval [0.565, 0.799] does not reach it.
+- **The other three drugs show no consistent geographic effect.** Isoniazid
+  scores 0.936 on held-out Canada against 0.855 within-cohort.
+- **The intervals are wide.** Malawi's rifampicin interval spans [0.432, 1.000]
+  on 7 resistant isolates; South Africa's pyrazinamide interval spans [0.396,
+  0.860]. Most individual country comparisons are inconclusive on their own.
+
+South Africa could not be evaluated for rifampicin at all: 107 of its 110
+labelled isolates are resistant.
+
+### What this justifies saying
+
+**Supported:** a random split grouped by isolate overstates performance by 0.05
+to 0.15 AUC relative to a study-grouped split, consistently across four drugs,
+with non-overlapping intervals. Published benchmarks reported under the first
+protocol should be read accordingly.
+
+**Supported, for rifampicin only:** performance degrades further on an unseen
+country, to 0.69&ndash;0.76.
+
+**Not supported:** that performance collapses across geography in general. The
+evidence for that is one drug, and three other drugs contradict it.
 
 ---
 
@@ -259,23 +284,26 @@ rest of the apparent accuracy was population structure.
 ## 5. What this project should claim
 
 Not: *"we added clinical features and improved on the FORUM-TB benchmark."* The
-data does not support it, and the claim would not survive scrutiny.
+features cannot be evaluated here at all (§3).
 
-Instead:
+Not: *"model performance collapses across geography."* That holds for rifampicin
+and is contradicted by the other three drugs (§2).
 
-> Published TB resistance benchmarks are typically reported under random splits
-> of pooled public genomes. We reproduce such a figure (0.958 AUC for rifampicin)
-> and then show that the same model scores 0.69–0.76 on held-out countries, with
-> non-overlapping confidence intervals. Grouping the split by study alone costs
-> 0.05 AUC. Label noise is excluded as an explanation: two independent sources
-> agree on 100% of 323 shared results. We further show that non-genomic metadata
-> appears to help under permissive splits and significantly hurts under strict
-> ones, because it encodes cohort identity rather than clinical signal.
+What the evidence does support:
 
-That is a methodological contribution about evaluation, it is supported by every
-number above, and it is more useful than a marginal improvement would have been.
+> We reproduce a standard TB resistance benchmark (0.958 AUC for rifampicin,
+> 0.947 for isoniazid) on independently recovered laboratory labels. We then
+> show that the usual evaluation protocol — a random split of pooled public
+> genomes — overstates performance by 0.05 to 0.15 AUC across four drugs
+> relative to a split that keeps each source study intact, with non-overlapping
+> confidence intervals in every case. Label noise is excluded as an explanation:
+> two independent label sources agree on 100% of 323 shared results. We further
+> show that this cohort cannot test whether geographic or clinical covariates
+> add signal, because study identity and country are perfectly confounded
+> (Cramér's V = 1.000).
 
----
+That is a methodological contribution about evaluation, every clause is backed
+by an interval, and it does not over-reach from one drug to four.
 
 ## 6. Honest limitations
 

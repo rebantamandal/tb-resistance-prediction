@@ -111,32 +111,35 @@ flagged isolates, and the measured performance of every model used.
 
 ## How well does it work?
 
-Held-out ROC-AUC, under three progressively harder evaluations. **Same models,
-same features — only the train/test split changes.**
+Held-out ROC-AUC with 95% bootstrap intervals. **Same models, same features —
+only the train/test split changes.**
 
-| Drug | Training labels | Random split | New cohort | New country |
-|---|---:|---:|---:|---:|
+| Drug | Labels | Grouped by isolate | Grouped by study | Held-out country |
+|---|---:|---:|---:|---|
 | Rifampicin | 2,625 | 0.958 | **0.908** | 0.69–0.76 |
-| Isoniazid | 2,603 | 0.947 | **0.855** | — |
+| Isoniazid | 2,603 | 0.947 | **0.855** | 0.77–0.94 |
 | Ethambutol | 2,408 | 0.913 | **0.765** | 0.63–0.84 |
 | Pyrazinamide | 1,839 | 0.911 | **0.782** | 0.63–0.84 |
 
-**Use the bold middle column as your working expectation.** It is what the model
-scores on isolates from a study it never trained on — the closest match to
-routine use.
+**Use the bold column as your working expectation.** It is what the model scores
+on isolates from a study it never trained on — the closest match to routine use.
 
-The three columns differ because of how the data is split, not because of
-anything about the model:
+### What the columns mean
 
-- **Random split** — the protocol usually reported in the literature. Isolates
-  from one study land on both sides of the split, so the model can partly
-  recognise the cohort rather than the biology.
-- **New cohort** — grouped so no study straddles the split. Costs ~0.05–0.15 AUC.
-- **New country** — an entire country held out of training. Costs another ~0.2.
+- **Grouped by isolate** — the protocol usually reported in the literature.
+  Isolates from one study land on both sides of the split, so the model can
+  partly recognise the cohort rather than the biology.
+- **Grouped by study** — no study straddles the split. This costs **0.05–0.15
+  AUC across all four drugs**, with non-overlapping intervals every time. This
+  is the project's most robust finding.
+- **Held-out country** — an entire country excluded from training. Results here
+  are **mixed and noisy**, not a uniform collapse. Rifampicin drops on all three
+  countries tested (Canada 0.686 [0.565, 0.799]). Isoniazid does the opposite,
+  scoring 0.936 on held-out Canada against 0.855 within-cohort. Six of fourteen
+  country results beat their study-grouped figure, and several intervals span
+  0.4 or more.
 
-For rifampicin the 95% bootstrap intervals for random-split (0.942–0.973) and
-held-out-Canada (0.565–0.799) **do not overlap**. This pattern holds for every
-drug tested. [`RESULTS.md`](RESULTS.md) has the full analysis.
+Full per-country results with intervals are in [`RESULTS.md`](RESULTS.md) §2.
 
 ### It learns real biology
 
@@ -153,6 +156,9 @@ standalone predictor:
 - maximum score difference from the recorded values: **5 × 10⁻⁵** (output rounding)
 - resistant/susceptible calls: **150 of 150 identical**
 - against real laboratory labels: accuracy **0.847**, ROC-AUC **0.947**
+
+A fresh `git clone` of this repository was verified to run the predictor and the
+full test suite with no extra downloads, producing byte-identical scores.
 
 ---
 

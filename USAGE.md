@@ -66,18 +66,25 @@ not make the model better.
 
 ## The four models
 
-| Drug | Training labels | Random split | New cohort | New country |
-|---|---|---|---|---|
-| Rifampicin | 2,625 | 0.958 | 0.908 | 0.69&ndash;0.76 |
-| Isoniazid | 2,603 | 0.947 | 0.855 | &mdash; |
-| Ethambutol | 2,408 | 0.913 | 0.765 | 0.63&ndash;0.84 |
-| Pyrazinamide | 1,839 | 0.911 | 0.782 | 0.63&ndash;0.84 |
+| Drug | Training labels | Grouped by isolate | Grouped by study | Held-out country |
+|---|---:|---:|---:|---|
+| Rifampicin | 2,625 | 0.958 | **0.908** | 0.69&ndash;0.76 |
+| Isoniazid | 2,603 | 0.947 | **0.855** | 0.77&ndash;0.94 |
+| Ethambutol | 2,408 | 0.913 | **0.765** | 0.63&ndash;0.84 |
+| Pyrazinamide | 1,839 | 0.911 | **0.782** | 0.63&ndash;0.84 |
 
-Held-out ROC-AUC. **Use the "new cohort" column as your working expectation** —
-it is what the model scores on isolates from a study it did not train on, which
-is the closest match to routine use. The "random split" column is the figure
-usually published and is the most optimistic. See `RESULTS.md` for why they
-differ and for bootstrap intervals.
+Held-out ROC-AUC. **Use the bold column as your working expectation** &mdash; it is
+what the model scores on isolates from a study it did not train on, which is the
+closest match to routine use. The first column is the figure usually published
+and is the most optimistic; moving to the second costs 0.05&ndash;0.15 AUC
+consistently across all four drugs.
+
+The held-out-country column is a **range across several countries, not a
+ceiling**. It is noisy and not uniformly worse: rifampicin drops on every
+country tested, while isoniazid scores 0.936 on held-out Canada against 0.855
+within-cohort. Several intervals span 0.4 or more. See `RESULTS.md` §2 for every
+country result with its interval, and treat any single country figure as weak
+evidence on its own.
 
 All four share one 814-feature panel, so they can be scored together in a single
 pass. If you retrain one, retrain them all from the same

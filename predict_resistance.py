@@ -58,7 +58,7 @@ DEFAULT_REGISTRY = {
         "run": "models/iso_genomic_baseline",
         "auc_random_split": 0.947,
         "auc_study_grouped": 0.855,
-        "auc_unseen_country_range": "not measured",
+        "auc_unseen_country_range": "0.77-0.94",
     },
     "Ethambutol": {
         "run": "models/eth_genomic_baseline",
@@ -315,8 +315,12 @@ def main(argv: list[str] | None = None) -> int:
         "how_to_read_the_performance_figures": (
             "The random-split figure is the one usually quoted and is the most "
             "optimistic. The study-grouped figure is what to expect on isolates "
-            "from a cohort the model did not train on. The unseen-country figure "
-            "is the realistic floor for a genuinely new setting."),
+            "from a cohort the model did not train on, and is the figure to plan "
+            "around. The unseen-country entry is a RANGE across several countries, "
+            "not a floor: it is noisy and not uniformly worse than the "
+            "study-grouped figure. Rifampicin drops on every country tested, while "
+            "isoniazid scores above its study-grouped value on two of four. Treat "
+            "any single country figure as weak evidence; see RESULTS.md section 2."),
     }
     report_path = args.out.with_suffix(".report.json")
     report_path.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
