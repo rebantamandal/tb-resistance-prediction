@@ -1,0 +1,161 @@
+{
+  "generated_utc": "2026-09-18T18:22:56+00:00",
+  "sources_used": {
+    "CRyPTIC": 124901,
+    "NCBI": 5304,
+    "BV-BRC": 15284
+  },
+  "cryptic_quality_grades_accepted": [
+    "HIGH",
+    "MEDIUM"
+  ],
+  "tie_break": "Where sources overlap, CRyPTIC is preferred, then NCBI, then BV-BRC",
+  "cross_source_agreement": {
+    "BV-BRC vs CRyPTIC": {
+      "covered_by_both": 0
+    },
+    "BV-BRC vs NCBI": {
+      "covered_by_both": 323,
+      "agreeing": 323,
+      "disagreeing": 0,
+      "agreement_rate": 1.0
+    },
+    "CRyPTIC vs NCBI": {
+      "covered_by_both": 0
+    }
+  },
+  "isolates_with_any_label": 2664,
+  "per_drug": {
+    "RIFAMPICIN": {
+      "labelled": 2625,
+      "resistant": 1446,
+      "susceptible": 1179,
+      "resistant_fraction": 0.5509
+    },
+    "ISONIAZID": {
+      "labelled": 2603,
+      "resistant": 1994,
+      "susceptible": 609,
+      "resistant_fraction": 0.766
+    },
+    "ETHAMBUTOL": {
+      "labelled": 2408,
+      "resistant": 755,
+      "susceptible": 1653,
+      "resistant_fraction": 0.3135
+    },
+    "PYRAZINAMIDE": {
+      "labelled": 1839,
+      "resistant": 629,
+      "susceptible": 1210,
+      "resistant_fraction": 0.342
+    },
+    "STREPTOMYCIN": {
+      "labelled": 1573,
+      "resistant": 914,
+      "susceptible": 659,
+      "resistant_fraction": 0.5811
+    },
+    "AMIKACIN": {
+      "labelled": 1163,
+      "resistant": 311,
+      "susceptible": 852,
+      "resistant_fraction": 0.2674
+    },
+    "CAPREOMYCIN": {
+      "labelled": 936,
+      "resistant": 256,
+      "susceptible": 680,
+      "resistant_fraction": 0.2735
+    },
+    "KANAMYCIN": {
+      "labelled": 719,
+      "resistant": 224,
+      "susceptible": 495,
+      "resistant_fraction": 0.3115
+    },
+    "OFLOXACIN": {
+      "labelled": 607,
+      "resistant": 204,
+      "susceptible": 403,
+      "resistant_fraction": 0.3361
+    },
+    "ETHIONAMIDE": {
+      "labelled": 576,
+      "resistant": 176,
+      "susceptible": 400,
+      "resistant_fraction": 0.3056
+    },
+    "MOXIFLOXACIN": {
+      "labelled": 495,
+      "resistant": 132,
+      "susceptible": 363,
+      "resistant_fraction": 0.2667
+    },
+    "PARA_AMINOSALICYLIC_ACID": {
+      "labelled": 363,
+      "resistant": 16,
+      "susceptible": 347,
+      "resistant_fraction": 0.0441
+    },
+    "CYCLOSERINE": {
+      "labelled": 359,
+      "resistant": 47,
+      "susceptible": 312,
+      "resistant_fraction": 0.1309
+    },
+    "CIPROFLOXACIN": {
+      "labelled": 285,
+      "resistant": 58,
+      "susceptible": 227,
+      "resistant_fraction": 0.2035
+    },
+    "RIFABUTIN": {
+      "labelled": 237,
+      "resistant": 210,
+      "susceptible": 27,
+      "resistant_fraction": 0.8861
+    },
+    "DELAMANID": {
+      "labelled": 224,
+      "resistant": 1,
+      "susceptible": 223,
+      "resistant_fraction": 0.0045
+    },
+    "PROTHIONAMIDE": {
+      "labelled": 218,
+      "resistant": 47,
+      "susceptible": 171,
+      "resistant_fraction": 0.2156
+    },
+    "BEDAQUILINE": {
+      "labelled": 213,
+      "resistant": 3,
+      "susceptible": 210,
+      "resistant_fraction": 0.0141
+    },
+    "LEVOFLOXACIN": {
+      "labelled": 199,
+      "resistant": 78,
+      "susceptible": 121,
+      "resistant_fraction": 0.392
+    },
+    "CLOFAZIMINE": {
+      "labelled": 187,
+      "resistant": 3,
+      "susceptible": 184,
+      "resistant_fraction": 0.016
+    },
+    "LINEZOLID": {
+      "labelled": 183,
+      "resistant": 3,
+      "susceptible": 180,
+      "resistant_fraction": 0.0164
+    }
+  },
+  "limitations": [
+    "Labels come from different laboratories, DST methods and critical concentrations; they are not harmonised beyond the binary R/S call.",
+    "A per-drug source column is included so any run can be repeated on a single source if mixing them proves unsatisfactory.",
+    "Pyrazinamide and ethambutol DST are known to be poorly reproducible; treat their labels, and any model trained on them, with more caution."
+  ]
+}

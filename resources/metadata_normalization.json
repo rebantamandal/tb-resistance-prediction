@@ -1,0 +1,92 @@
+{
+  "_comment": [
+    "Editable normalisation rules for free-text ENA metadata. Nothing here infers a",
+    "value that a submitter did not record: these rules only recognise explicit null",
+    "placeholders and group verbatim specimen strings into coarse categories.",
+    "Review and extend these lists for your own study, and document any change."
+  ],
+
+  "null_tokens": [
+    "",
+    "missing",
+    "unknown",
+    "not known",
+    "not applicable",
+    "not collected",
+    "not provided",
+    "not available",
+    "none",
+    "n/a",
+    "na",
+    "null",
+    "restricted access",
+    "missing;hospital"
+  ],
+
+  "_facility_comment": [
+    "Values that name a collection facility rather than a country. ENA submitters",
+    "sometimes place these in the country field. They are NOT recoded to a country",
+    "here, because doing so would be an inference rather than a recorded fact; they",
+    "are moved to collection_site and country_clean is left blank. The listed",
+    "facilities are all KwaZulu-Natal (South Africa) TB hospitals and clinics, so",
+    "they can be recoded to South Africa once you have verified this against the",
+    "originating study."
+  ],
+  "facility_values": [
+    "m3 tb hospital",
+    "catherine booth",
+    "st margaret's hospital",
+    "st margaret's tb hospital",
+    "church of scotland",
+    "christ the king hospital",
+    "stanger hospital",
+    "siloah clinic",
+    "dundee hospital",
+    "goodwins clinic",
+    "chwezi clinic",
+    "ethembeni clinic"
+  ],
+
+  "_specimen_comment": [
+    "Maps verbatim isolation_source strings to a coarse specimen category usable as",
+    "the 'infection site' clinical feature. Strings that describe no anatomical site",
+    "(for example 'patient', 'culture', 'clinical sample') map to 'unspecified',",
+    "which is a recorded non-answer and must not be read as pulmonary."
+  ],
+  "specimen_categories": {
+    "sputum": "respiratory",
+    "missing;sputum": "respiratory",
+    "bal": "respiratory",
+    "bronchial": "respiratory",
+    "bronchoalveolar lavage": "respiratory",
+    "lung": "respiratory",
+    "pleural fluid": "respiratory",
+
+    "cerebrospinal fluid": "extrapulmonary",
+    "csf": "extrapulmonary",
+    "abscess": "extrapulmonary",
+    "lymph galnd": "extrapulmonary",
+    "lymph gland": "extrapulmonary",
+    "lymph node": "extrapulmonary",
+    "gland": "extrapulmonary",
+    "tissue": "extrapulmonary",
+    "pericard": "extrapulmonary",
+    "bone": "extrapulmonary",
+    "urine": "extrapulmonary",
+    "pus": "extrapulmonary",
+    "blood": "extrapulmonary",
+
+    "excreted bodily substance": "unspecified_fluid",
+    "bodily fluid": "unspecified_fluid",
+    "missing;bodily fluid": "unspecified_fluid",
+    "secrete": "unspecified_fluid",
+
+    "patient": "unspecified",
+    "culture": "unspecified",
+    "clinical sample": "unspecified",
+    "other": "unspecified",
+    "punctuat": "unspecified",
+    "vsk": "unspecified",
+    "morgue": "unspecified"
+  }
+}

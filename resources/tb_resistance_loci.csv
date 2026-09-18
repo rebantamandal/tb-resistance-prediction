@@ -1,0 +1,44 @@
+gene,start,end,strand,drugs,note
+gyrB,5240,7267,+,levofloxacin;moxifloxacin,Fluoroquinolone target
+gyrA,7302,9818,+,levofloxacin;moxifloxacin,Fluoroquinolone target
+fgd1,491561,492898,+,delamanid;pretomanid,Nitroimidazole prodrug activation
+mshA,575148,576674,+,ethionamide;isoniazid,Prodrug activation pathway
+rpoB,759807,763325,+,rifampicin,RNA polymerase beta subunit; RRDR
+rpoC,763370,767320,+,rifampicin,Compensatory mutations
+rpsL,781560,781934,+,streptomycin,Ribosomal protein S12
+rplC,800809,801462,+,linezolid,50S ribosomal protein L3
+mmpL5,775586,778480,-,bedaquiline;clofazimine,Efflux pump
+mmpS5,778477,778905,-,bedaquiline;clofazimine,Efflux pump accessory
+Rv0678,778990,779487,+,bedaquiline;clofazimine,MmpR5 transcriptional repressor
+fbiC,1303114,1304802,+,delamanid;pretomanid,F420 biosynthesis
+atpE,1461045,1461290,+,bedaquiline,ATP synthase subunit c
+rrs,1471846,1473382,+,amikacin;kanamycin;streptomycin;capreomycin,16S rRNA
+rrl,1473658,1476795,+,linezolid,23S rRNA
+fabG1,1673440,1674183,+,isoniazid;ethionamide,inhA operon promoter region
+inhA,1674202,1675011,+,isoniazid;ethionamide,Enoyl-ACP reductase
+rpsA,1833542,1834987,+,pyrazinamide,Ribosomal protein S1
+tlyA,1917940,1918746,+,capreomycin,rRNA methyltransferase
+ndh,2101651,2103042,+,isoniazid;ethionamide,NADH dehydrogenase
+katG,2153889,2156111,-,isoniazid,Catalase-peroxidase; prodrug activation
+pncA,2288681,2289241,-,pyrazinamide,Pyrazinamidase
+kasA,2518115,2519365,+,isoniazid,Beta-ketoacyl-ACP synthase
+eis,2714124,2715332,-,kanamycin;amikacin,Aminoglycoside acetyltransferase
+ahpC,2726193,2726780,+,isoniazid,Alkyl hydroperoxidase; compensatory
+folC,2746135,2747577,-,para-aminosalicylic_acid,Dihydrofolate synthase
+ribD,2986839,2987693,+,para-aminosalicylic_acid,Riboflavin biosynthesis
+thyX,3067193,3067945,+,para-aminosalicylic_acid,Thymidylate synthase
+thyA,3073680,3074471,-,para-aminosalicylic_acid,Thymidylate synthase A
+ald,3086788,3087891,+,cycloserine,Alanine dehydrogenase
+ddn,3986844,3987299,+,delamanid;pretomanid,Deazaflavin-dependent nitroreductase
+fbiA,3640394,3641350,+,delamanid;pretomanid,F420 biosynthesis
+fbiB,3641354,3642196,+,delamanid;pretomanid,F420 biosynthesis
+alr,3840194,3841420,-,cycloserine,Alanine racemase
+embC,4239863,4242950,+,ethambutol,Arabinosyltransferase
+embA,4243460,4246097,+,ethambutol,Arabinosyltransferase
+embB,4246514,4249810,+,ethambutol,Arabinosyltransferase
+aftB,4266753,4268157,-,ethambutol,Arabinofuranosyltransferase
+ubiA,4269284,4270180,-,ethambutol,Decaprenylphosphoryl-ribose synthesis
+ethA,4326004,4327473,-,ethionamide,Prodrug activation monooxygenase
+ethR,4327549,4328199,+,ethionamide,ethA repressor
+whiB6,4338332,4338697,-,multiple,Regulator
+gid,4407528,4408202,-,streptomycin,16S rRNA methyltransferase

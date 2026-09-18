@@ -1,0 +1,161 @@
+[
+  {
+    "run": "models\\rif_genomic_baseline",
+    "held_out_isolates": 525,
+    "held_out_resistant": 290,
+    "held_out_susceptible": 235,
+    "bootstrap_resamples_requested": 2000,
+    "bootstrap_resamples_usable": 2000,
+    "confidence_level": 0.95,
+    "models": {
+      "genomic_only": {
+        "roc_auc_point": 0.9580924431401321,
+        "average_precision_point": 0.9714339652677275,
+        "roc_auc_ci": {
+          "median": 0.9584315762706047,
+          "low": 0.9419970841540716,
+          "high": 0.9726756472399715
+        }
+      }
+    },
+    "comparisons": {}
+  },
+  {
+    "run": "models\\rif_bystudy",
+    "held_out_isolates": 701,
+    "held_out_resistant": 424,
+    "held_out_susceptible": 277,
+    "bootstrap_resamples_requested": 2000,
+    "bootstrap_resamples_usable": 2000,
+    "confidence_level": 0.95,
+    "models": {
+      "genomic_only": {
+        "roc_auc_point": 0.9082913289285469,
+        "average_precision_point": 0.9340803762401577,
+        "roc_auc_ci": {
+          "median": 0.9086549931954175,
+          "low": 0.8851707857541591,
+          "high": 0.9307562306870961
+        }
+      },
+      "full": {
+        "roc_auc_point": 0.8694102922144268,
+        "average_precision_point": 0.9187998601149472,
+        "roc_auc_ci": {
+          "median": 0.8698853093107959,
+          "low": 0.8420529010992029,
+          "high": 0.8973574287979866
+        }
+      }
+    },
+    "comparisons": {
+      "full minus genomic_only": {
+        "median": -0.03861767310914854,
+        "low": -0.05070197550516629,
+        "high": -0.028067045945466666,
+        "point": -0.03888103671412013,
+        "fraction_of_resamples_favouring_full": 0.0,
+        "interval_excludes_zero": true
+      }
+    }
+  },
+  {
+    "run": "models\\rif_geo_holdout_canada",
+    "held_out_isolates": 178,
+    "held_out_resistant": 34,
+    "held_out_susceptible": 144,
+    "bootstrap_resamples_requested": 2000,
+    "bootstrap_resamples_usable": 2000,
+    "confidence_level": 0.95,
+    "models": {
+      "genomic_only": {
+        "roc_auc_point": 0.6668709150326797,
+        "average_precision_point": 0.5295051254466874,
+        "roc_auc_ci": {
+          "median": 0.668170469280684,
+          "low": 0.5467007326049543,
+          "high": 0.7799271667573907
+        }
+      },
+      "full": {
+        "roc_auc_point": 0.6862745098039217,
+        "average_precision_point": 0.5716967700371811,
+        "roc_auc_ci": {
+          "median": 0.6882492721576163,
+          "low": 0.5687761359215913,
+          "high": 0.7962945872620527
+        }
+      }
+    },
+    "comparisons": {
+      "full minus genomic_only": {
+        "median": 0.018840579710144967,
+        "low": 0.005850184298460207,
+        "high": 0.03446092231937823,
+        "point": 0.019403594771241983,
+        "fraction_of_resamples_favouring_full": 1.0,
+        "interval_excludes_zero": true
+      }
+    }
+  },
+  {
+    "run": "models\\inh_genomic_baseline",
+    "held_out_isolates": 521,
+    "held_out_resistant": 408,
+    "held_out_susceptible": 113,
+    "bootstrap_resamples_requested": 2000,
+    "bootstrap_resamples_usable": 2000,
+    "confidence_level": 0.95,
+    "models": {
+      "genomic_only": {
+        "roc_auc_point": 0.9472930765226445,
+        "average_precision_point": 0.9861861217556371,
+        "roc_auc_ci": {
+          "median": 0.947736910393097,
+          "low": 0.9279414834690479,
+          "high": 0.9641926090970029
+        }
+      }
+    },
+    "comparisons": {}
+  },
+  {
+    "run": "models\\inh_bystudy",
+    "held_out_isolates": 619,
+    "held_out_resistant": 531,
+    "held_out_susceptible": 88,
+    "bootstrap_resamples_requested": 2000,
+    "bootstrap_resamples_usable": 2000,
+    "confidence_level": 0.95,
+    "models": {
+      "genomic_only": {
+        "roc_auc_point": 0.855482794042116,
+        "average_precision_point": 0.9747189292257494,
+        "roc_auc_ci": {
+          "median": 0.8564743323366169,
+          "low": 0.8219397001795109,
+          "high": 0.8872837762964171
+        }
+      },
+      "full": {
+        "roc_auc_point": 0.8508709981167609,
+        "average_precision_point": 0.9729816281970138,
+        "roc_auc_ci": {
+          "median": 0.8517578794777145,
+          "low": 0.8148253712063787,
+          "high": 0.8845577721478145
+        }
+      }
+    },
+    "comparisons": {
+      "full minus genomic_only": {
+        "median": -0.004589649974801491,
+        "low": -0.012086638961866607,
+        "high": 0.002449236240405586,
+        "point": -0.0046117959253551,
+        "fraction_of_resamples_favouring_full": 0.0945,
+        "interval_excludes_zero": false
+      }
+    }
+  }
+]

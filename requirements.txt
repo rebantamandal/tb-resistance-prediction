@@ -1,0 +1,6 @@
+# Requires Python 3.11 or newer; tested here with Python 3.13. Use a dedicated virtual environment.
+# The browser UI uses the Python standard library; no web framework is needed.
+numpy==2.3.5
+pandas==2.2.3
+scikit-learn==1.8.0
+joblib==1.5.3

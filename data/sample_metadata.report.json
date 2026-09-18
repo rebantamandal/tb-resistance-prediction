@@ -1,0 +1,47 @@
+{
+  "generated_utc": "2026-09-18T12:04:23+00:00",
+  "source": "ENA portal API (https://www.ebi.ac.uk/ena/portal/api), result=read_run",
+  "accessions_requested": 9842,
+  "accessions_matched_in_ena": 9842,
+  "normalization_rules": "resources\\metadata_normalization.json",
+  "coverage_after_normalization": {
+    "country": 4628,
+    "specimen_category": 3682,
+    "collection_year": 4796,
+    "facility_name_in_country_field": 64
+  },
+  "distinct_countries": 18,
+  "isolates_per_country": {
+    "South Africa": 1243,
+    "Peru": 889,
+    "Russia": 593,
+    "Belarus": 468,
+    "Sweden": 415,
+    "Canada": 179,
+    "Malawi": 170,
+    "Mali": 164,
+    "India": 147,
+    "Thailand": 126,
+    "United Kingdom": 109,
+    "Uganda": 47,
+    "Romania": 34,
+    "Australia": 19,
+    "Italy": 16,
+    "Taiwan": 4,
+    "Colombia": 4,
+    "USA": 1
+  },
+  "isolates_per_specimen_category": {
+    "respiratory": 1309,
+    "unspecified": 1199,
+    "unspecified_fluid": 1061,
+    "extrapulmonary": 73,
+    "other_recorded": 40
+  },
+  "limitations": [
+    "Coverage is whatever the original submitter registered; SRA-sourced runs are frequently missing country and isolation_source entirely.",
+    "Country is the collection country recorded for the sample, not the patient's residence or country of infection.",
+    "ENA free-text fields are not harmonised; isolation_source in particular needs manual grouping into a small set of categories before use as a feature.",
+    "Missing values are left blank and are never imputed here."
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "organism": "REPLACE_WITH_EXACT_ORGANISM",
+  "antibiotic": "REPLACE_WITH_EXACT_ANTIBIOTIC",
+  "genomic_columns": [
+    "genomic_feature_1",
+    "genomic_feature_2"
+  ],
+  "organism_column": "organism",
+  "antibiotic_column": "antibiotic",
+  "target_column": "resistant",
+  "sample_column": "isolate_id",
+  "group_column": "patient_id",
+  "clinical_numeric_columns": [],
+  "clinical_categorical_columns": [],
+  "geographic_columns": [],
+  "compare_full": false,
+  "split_method": "group_random",
+  "holdout_column": "",
+  "holdout_values": [],
+  "test_size": 0.2,
+  "threshold": 0.5,
+  "n_estimators": 300,
+  "random_state": 42,
+  "permutation_repeats": 0
+}
