@@ -19,9 +19,12 @@ artefact of how the data is split, not evidence that the model would work on a
 new patient in a new place.
 
 Adding clinical and geographic features — the original planned contribution —
-does not reliably help. Under the strictest honest split it makes things
-**worse** (−0.039 AUC, interval excludes zero), because those features were
-serving as a fingerprint for which study an isolate came from.
+**cannot be evaluated on this cohort at all**. Every study in it is confined to
+exactly one country (Cramér's V between study and country = 1.000), so
+geography and cohort identity are the same variable. Two earlier comparisons
+returned +0.017 and −0.039 AUC; both intervals exclude zero and they disagree in
+sign, because each was measuring a different artefact rather than geography. §3
+sets this out.
 
 ---
 
@@ -40,7 +43,7 @@ serving as a fingerprint for which study an isolate came from.
 | FORUM-TB genomic-only baseline | Built; the dataset ships no labels, so labels were recovered from BV-BRC, CRyPTIC and NCBI | **Yes, with work** |
 | Benchmark ~0.97 rifampicin, ~0.95 isoniazid | 0.958 and 0.947 on independently recovered labels | **Reproduced** |
 | Contribution: baseline vs full comparison | Run for four drugs under three evaluation protocols | **Yes** |
-| Expected result: full model improves on baseline | It does not. Under study-grouped evaluation it is worse (rifampicin &minus;0.039 AUC, interval excludes zero) | **Negative result** |
+| Expected result: full model improves on baseline | Not answerable with this cohort: study and country are perfectly confounded (Cram&eacute;r's V 1.000), and only 5 independent groups have complete metadata | **Untestable** |
 | India primary: Delhi, Chennai, Bengaluru | The cohort has 147 Indian isolates, from Tiruvallur (136) and Mumbai (7) | **Not supported** |
 | Secondary: USA or UK | USA has 1 isolate; UK has 109 | **UK only, thinly** |
 | Third: China or South Africa | South Africa has 1,243 isolates, but 97% are resistant so its held-out metrics are undefined | **Partly** |
@@ -155,48 +158,86 @@ quietly dropped.
 
 ---
 
-## 3. Baseline versus full model: the planned contribution does not hold
+## 3. Do clinical and geographic features help? The question is not answerable here
 
-The full model adds real ENA-derived `country`, `city_or_region` and
-`infection_site`. Both models are always fitted and scored on **identical rows**.
+This was the project's stated contribution, so it deserves a precise answer
+rather than a number. The answer is that **this cohort cannot test the
+hypothesis**, and the two earlier attempts each measured a different defect.
 
-| Evaluation | Baseline | Full | Difference | 95% interval |
-|---|---|---|---|---|
-| Random split by study | 0.908 | 0.869 | **−0.039** | [−0.051, −0.028] |
-| Held-out Canada | 0.686 | 0.678 | −0.008 | [−0.029, +0.010] |
-| Held-out United Kingdom | 0.758 | 0.785 | +0.027 | [+0.002, +0.059] |
-| Held-out Malawi | 0.761 | 0.813 | +0.052 | [+0.000, +0.133] |
+### Two comparisons, two opposite answers, both wrong
 
-The sign is not stable. Under the strictest evaluation the extra features make
-the model **significantly worse**. On two held-out countries they help slightly,
-on one they do not, and no interval is far from zero.
+| Comparison | Full minus baseline | Why it is not informative |
+|---|---:|---|
+| Complete metadata, grouped by **isolate** | **+0.017** [+0.003, +0.041] | Isolates from one study sit on both sides of the split, so `country` works as a lookup for that study's resistance rate. |
+| All labelled isolates, grouped by **study** | **&minus;0.039** [&minus;0.051, &minus;0.028] | `country` is blank for 78% of rows, and blankness itself predicts resistance (61.8% resistant when missing vs 30.6% when present). The model is handed a missingness signal, not a geographic one. |
 
-**Conclusion: adding clinical and geographic features has not been shown to
-improve prediction, and under study-grouped evaluation it degrades it.** This is
-a negative result for the project's original framing, and it is well supported.
+Both intervals exclude zero, and they have opposite signs. That alone should
+prevent either being reported as the project's result.
 
-### Why: the features were identifying the cohort
+### Why no third comparison can fix it
 
-An earlier version of the full model included `host` as a clinical feature.
-Permutation importance ranked it *second*, above every genomic feature except
-rpoB Ser450Leu. That was not biology:
+The obvious fix is to run the cell neither covered: complete metadata **and**
+grouped by study. That cohort has 517 labelled isolates. It also has, in total:
 
-| `host` value | Isolates | Resistant |
-|---|---|---|
-| `Homo sapiens` | 407 | 13.3% |
-| blank | 110 | **97.3%** |
+| | Count |
+|---|---:|
+| Independent studies | **5** |
+| Countries | 4 |
+| Studies spanning more than one country | **0** |
+| Cram&eacute;r's V between study and country | **1.000** |
 
-The blank-host isolates were exactly the South African MDR cohort. The model had
-learned that *missing metadata* identifies a high-resistance study. `host` was
-removed.
+Across the whole labelled set with a recorded country (570 isolates), **100% of
+studies are confined to exactly one country**, and Cram&eacute;r's V is 1.000. Study
+identity and country are not merely correlated in this data; they are the same
+variable measured twice.
 
-`country` does the same thing more subtly. When isolates from one study can
-straddle the split, knowing the country helps the model recall that study's
-resistance rate, and the full model appears better (+0.017 on the isolate-grouped
-run). When study grouping blocks that shortcut, the same features become noise
-that costs 0.039 AUC. **The apparent benefit and its disappearance are the same
-phenomenon seen from two sides**, which is stronger evidence than either result
-alone.
+The consequences are unavoidable:
+
+- **Group by isolate** and `country` becomes a cohort lookup, inflating the full
+  model. That is the +0.017.
+- **Group by study** and every held-out isolate belongs to a country absent from
+  training, so `country` is an unseen category carrying no information. The full
+  model can only match or trail the baseline, whatever geography's true effect.
+
+There is no split of this dataset under which a genuine geographic effect could
+be distinguished from a cohort effect, because no study ever crosses a border.
+
+### The clinical feature has the same problem
+
+`infection_site` varies within only **2 of the 5** studies, both in Malawi. In
+the other three it is constant, so there it is a pure study indicator. Within
+the two where it does vary, there are **7 resistant isolates in total** &mdash; no
+power to detect anything.
+
+### Sample size compounds it
+
+The complete-metadata cohort holds 5 independent groups. A grouped 80/20 split
+puts **one study** in the test set. For rifampicin that split is degenerate
+(`PRJEB2358` contains no resistant isolate at all), so the run cannot even
+complete. Five groups is below any reasonable threshold for a grouped
+comparison.
+
+### What can honestly be said
+
+1. The clinical and geographic features available for this cohort **cannot be
+   evaluated**, because each is perfectly confounded with study identity.
+2. The earlier +0.017 and &minus;0.039 are measurements of that confounding, not of
+   geography. Neither belongs in a write-up as a finding about resistance.
+3. The released models are therefore **genomic-only**. That is a decision forced
+   by the data, not a conclusion that geography is irrelevant to resistance &mdash;
+   which is almost certainly false in reality, and remains untested here.
+
+### What would answer the question
+
+A cohort where the two are separable: **isolates from several countries within
+the same study**, or **several independent studies within one country**. Either
+breaks the confounding. The CRyPTIC compendium collects isolates from 23
+countries under one protocol and is the obvious candidate; only 257 of its
+isolates overlap this variant file, so it would mean starting from CRyPTIC's own
+genomes rather than FORUM-TB's.
+
+Recording the confounding explicitly is worth more than reporting a number that
+measures it by accident.
 
 ---
 

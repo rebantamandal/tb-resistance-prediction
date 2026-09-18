@@ -284,10 +284,15 @@ and the predictor's matrix construction.
 - **Clinical features are mostly unavailable.** Age, prior antibiotic exposure
   and hospitalisation duration are not recorded for these accessions in any
   public source, and were not invented. Only infection site was obtainable.
-- **Adding geography did not help.** Under study-grouped evaluation, country and
-  city *reduced* rifampicin AUC by 0.039 — they were acting as a fingerprint for
-  which study an isolate came from. The released models are genomic-only for
-  this reason. See [`RESULTS.md`](RESULTS.md) §3.
+- **Geography and clinical features could not be evaluated.** Every study in
+  this cohort sits in exactly one country (Cramér's V between study and country
+  = 1.000), so "which country" and "which cohort" are the same variable. Group
+  the split by isolate and country becomes a cohort lookup (+0.017 AUC); group
+  it by study and country is an unseen category carrying nothing (−0.039 AUC).
+  Both intervals exclude zero and they disagree in sign, because each measures a
+  different artefact. The released models are genomic-only for that reason — not
+  because geography is irrelevant to resistance, which remains untested here.
+  See [`RESULTS.md`](RESULTS.md) §3.
 
 ---
 
