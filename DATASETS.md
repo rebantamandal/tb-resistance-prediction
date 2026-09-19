@@ -51,9 +51,32 @@ reasoned explanation rather than a measured one.
 samples overlap the current dataset, so this means working with their genomes
 rather than extending the existing ones.
 
-**Recommended first step:** take `GENOMES.csv.gz` (5 MB) and the reuse table and
-check how many of the 25 collection sites appear in more than one country. If
-even a few do, the geography question becomes answerable.
+### Checked: what CRyPTIC actually contains
+
+`GENOMES.csv.gz` was downloaded and inspected. Across its 23 numbered
+collection sites:
+
+| | Current project | CRyPTIC |
+|---|---:|---:|
+| Collection sites | 958 studies | **23 sites** |
+| Protocols used | 958 different ones | **one, shared** |
+| Genomes | 9,842 | **38,004** |
+| Distinct patients | **none recorded** | **36,636** |
+| Genetic lineage | not available | **recorded** |
+| Samples from India | 147 | **4,393** (site 04, Mumbai) |
+
+The largest sites hold 10,697, 4,883, 4,393, 2,930 and 2,662 genomes. Named
+sites in their documentation include Mumbai (04), Peru (05) and Taiwan (13).
+
+**Each site is still a single country**, so site and country remain linked. But
+the decisive difference is that **all 23 sites used the same laboratory
+protocol**. In the current data, "which collection" also means "which
+laboratory method, which sampling rules, which patient population" — three
+confounds at once. CRyPTIC removes the first two, leaving only the third, and
+the lineage column lets that one be tested directly rather than assumed.
+
+India alone goes from 147 samples to 4,393 — a thirtyfold increase, and enough
+to support the India-focused analysis the original brief wanted.
 
 ---
 
