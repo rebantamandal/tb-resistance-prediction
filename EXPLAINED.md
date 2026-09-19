@@ -120,7 +120,7 @@ You will see something like:
 
 ```text
 RESEARCH ONLY. Uncalibrated scores, not clinically validated...
-Scoring with 4 model(s): Ethambutol, Isoniazid, Pyrazinamide, Rifampicin
+Scoring with 5 model(s): Ethambutol, Isoniazid, Pyrazinamide, Rifampicin, Streptomycin
   read 6,781 variant rows, 4 isolates
 
 Wrote test.csv (4 isolates scored).
@@ -128,6 +128,7 @@ Wrote test.csv (4 isolates scored).
   Isoniazid          3 resistant /     1 susceptible
   Pyrazinamide       2 resistant /     2 susceptible
   Rifampicin         2 resistant /     2 susceptible
+  Streptomycin       1 resistant /     3 susceptible
 ```
 
 Line by line:
@@ -135,7 +136,7 @@ Line by line:
 | Line | Meaning |
 |---|---|
 | `RESEARCH ONLY...` | Prints every time. Don't treat a real patient with this. |
-| `Scoring with 4 model(s)` | Every sample is checked against all four drugs. |
+| `Scoring with 5 model(s)` | Every sample is checked against all five drugs. |
 | `read 6,781 variant rows, 4 isolates` | It found 6,781 mutations belonging to 4 samples. |
 | `Wrote test.csv` | **The answers are in this file.** |
 | `Rifampicin 2 resistant / 2 susceptible` | Just a tally. Not the per-sample answers. |
@@ -144,12 +145,12 @@ The terminal only shows a summary. Open the CSV for the real output.
 
 ## 5. Reading the output
 
-| Sample | Rifampicin | Isoniazid | Ethambutol | Pyrazinamide |
-|---|---|---|---|---|
-| ERR047002 | Susceptible `0.25` | **Resistant** `0.74` | Susceptible `0.19` | Susceptible `0.16` |
-| ERR047009 | Susceptible `0.17` | Susceptible `0.16` | Susceptible `0.20` | Susceptible `0.18` |
-| ERR1034590 | **Resistant** `0.91` | **Resistant** `0.98` | **Resistant** `0.76` | **Resistant** `0.72` |
-| ERR1034591 | **Resistant** `0.85` | **Resistant** `0.89` | Susceptible `0.45` | **Resistant** `0.69` |
+| Sample | Rifampicin | Isoniazid | Streptomycin | Ethambutol | Pyrazinamide |
+|---|---|---|---|---|---|
+| ERR047002 | Susceptible `0.25` | **Resistant** `0.74` | Susceptible `0.24` | Susceptible `0.19` | Susceptible `0.16` |
+| ERR047009 | Susceptible `0.17` | Susceptible `0.16` | Susceptible `0.27` | Susceptible `0.20` | Susceptible `0.18` |
+| ERR1034590 | **Resistant** `0.91` | **Resistant** `0.98` | **Resistant** `0.68` | **Resistant** `0.76` | **Resistant** `0.72` |
+| ERR1034591 | **Resistant** `0.85` | **Resistant** `0.89` | Susceptible `0.43` | Susceptible `0.45` | **Resistant** `0.69` |
 
 Read a row as: *"For sample ERR1034590, rifampicin will probably fail."*
 
@@ -159,11 +160,11 @@ Read a row as: *"For sample ERR1034590, rifampicin will probably fail."*
 
 Three things worth noticing in that table:
 
-- **ERR1034590 is bad news across the board.** All four drugs flagged, all with
-  high confidence. That is what a heavily drug-resistant sample looks like.
+- **ERR1034590 is bad news across the board.** All five drugs flagged. That is
+  what a heavily drug-resistant sample looks like.
 - **ERR047009 is clean.** Everything low. Standard drugs should work.
-- **ERR1034591's ethambutol is `0.45`** — right on the fence. It was called
-  Susceptible only because 0.45 is below 0.50. Anything between about 0.4 and
+- **ERR1034591's ethambutol is `0.45` and streptomycin `0.43`** — right on the
+  fence. Both were called Susceptible only because they sit below 0.50. Anything between about 0.4 and
   0.6 is the tool saying "honestly, not sure." In real use those are the ones
   you would send for laboratory testing rather than trusting.
 
@@ -261,10 +262,10 @@ project's write-up concluded "performance collapses across geography."
 
 **Then we checked the other three drugs and it wasn't true.** Isoniazid scored
 **0.936** on a country it had never seen — *better* than the 0.855 it managed on
-familiar data. Six of fourteen country tests beat their baseline.
+familiar data. Six of seventeen country tests beat their baseline. And streptomycin scored **0.359 on South Africa — worse than a coin flip**, meaning it got that group reliably backwards.
 
 The original claim generalised from a single drug. It is corrected throughout
-now. The honest version is: one drug degrades across countries, three do not,
+now. The honest version is: one drug degrades across countries, others do not, and one fails outright on a single group,
 and the numbers are too noisy to conclude much either way.
 
 It is recorded here rather than quietly deleted because a reviewer checking the
@@ -307,7 +308,7 @@ cannot support it.
 
 > We reproduced the published benchmark (0.958 AUC for rifampicin). We then
 > showed that the standard way of testing these models inflates the score by
-> 0.05 to 0.15 across four drugs, because samples from the same collection end
+> 0.05 to 0.15 across five drugs, because samples from the same collection end
 > up on both sides of the test. We also showed that this dataset cannot test
 > whether location adds anything, because location and collection are the same
 > variable within it.

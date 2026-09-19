@@ -72,6 +72,15 @@ DEFAULT_REGISTRY = {
         "auc_study_grouped": 0.782,
         "auc_unseen_country_range": "0.63-0.84",
     },
+    "Streptomycin": {
+        "run": "models/str_genomic_baseline",
+        "auc_random_split": 0.948,
+        "auc_study_grouped": 0.897,
+        # South Africa scored 0.359, below chance: on that cohort the model
+        # ranks resistant isolates as LESS likely resistant than susceptible
+        # ones. Reported rather than hidden; see RESULTS.md.
+        "auc_unseen_country_range": "0.36-0.86",
+    },
 }
 
 

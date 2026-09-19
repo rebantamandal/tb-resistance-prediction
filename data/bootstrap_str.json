@@ -1,0 +1,179 @@
+[
+  {
+    "run": "models\\str_genomic_baseline",
+    "held_out_isolates": 315,
+    "held_out_resistant": 189,
+    "held_out_susceptible": 126,
+    "bootstrap_resamples_requested": 2000,
+    "bootstrap_resamples_usable": 2000,
+    "confidence_level": 0.95,
+    "models": {
+      "genomic_only": {
+        "roc_auc_point": 0.948076761568825,
+        "average_precision_point": 0.97056197184314,
+        "roc_auc_ci": {
+          "median": 0.949111063990099,
+          "low": 0.9251706458278152,
+          "high": 0.9691112431948576
+        }
+      }
+    },
+    "comparisons": {}
+  },
+  {
+    "run": "models\\str_bystudy",
+    "held_out_isolates": 926,
+    "held_out_resistant": 672,
+    "held_out_susceptible": 254,
+    "bootstrap_resamples_requested": 2000,
+    "bootstrap_resamples_usable": 2000,
+    "confidence_level": 0.95,
+    "models": {
+      "genomic_only": {
+        "roc_auc_point": 0.8973038526434195,
+        "average_precision_point": 0.9636226267993062,
+        "roc_auc_ci": {
+          "median": 0.8977257505047886,
+          "low": 0.8778602003188488,
+          "high": 0.9149838292978997
+        }
+      },
+      "full": {
+        "roc_auc_point": 0.8855602034120735,
+        "average_precision_point": 0.9590719460689123,
+        "roc_auc_ci": {
+          "median": 0.8855892828464529,
+          "low": 0.8644834610137806,
+          "high": 0.9049514125786392
+        }
+      }
+    },
+    "comparisons": {
+      "full minus genomic_only": {
+        "median": -0.0117043340436766,
+        "low": -0.01727077191646835,
+        "high": -0.006173222178503294,
+        "point": -0.011743649231345965,
+        "fraction_of_resamples_favouring_full": 0.0,
+        "interval_excludes_zero": true
+      }
+    }
+  },
+  {
+    "run": "models\\geo_sweep_str\\holdout_Canada",
+    "held_out_isolates": 177,
+    "held_out_resistant": 43,
+    "held_out_susceptible": 134,
+    "bootstrap_resamples_requested": 2000,
+    "bootstrap_resamples_usable": 2000,
+    "confidence_level": 0.95,
+    "models": {
+      "genomic_only": {
+        "roc_auc_point": 0.8558660187434919,
+        "average_precision_point": 0.7529533528360858,
+        "roc_auc_ci": {
+          "median": 0.8575553910938236,
+          "low": 0.771666013090964,
+          "high": 0.9269818113297366
+        }
+      },
+      "full": {
+        "roc_auc_point": 0.8746095105866019,
+        "average_precision_point": 0.834217709147893,
+        "roc_auc_ci": {
+          "median": 0.8763431783159186,
+          "low": 0.7863996379846986,
+          "high": 0.9487482574719699
+        }
+      }
+    },
+    "comparisons": {
+      "full minus genomic_only": {
+        "median": 0.01863666121112939,
+        "low": 0.0005728101178404002,
+        "high": 0.04144659209975381,
+        "point": 0.018743491843109972,
+        "fraction_of_resamples_favouring_full": 0.9775,
+        "interval_excludes_zero": true
+      }
+    }
+  },
+  {
+    "run": "models\\geo_sweep_str\\holdout_Malawi",
+    "held_out_isolates": 107,
+    "held_out_resistant": 25,
+    "held_out_susceptible": 82,
+    "bootstrap_resamples_requested": 2000,
+    "bootstrap_resamples_usable": 2000,
+    "confidence_level": 0.95,
+    "models": {
+      "genomic_only": {
+        "roc_auc_point": 0.761219512195122,
+        "average_precision_point": 0.5229232017951742,
+        "roc_auc_ci": {
+          "median": 0.7623594796008588,
+          "low": 0.6590709534368071,
+          "high": 0.8463914628614124
+        }
+      },
+      "full": {
+        "roc_auc_point": 0.7404878048780488,
+        "average_precision_point": 0.48959704196859466,
+        "roc_auc_ci": {
+          "median": 0.7401093409339287,
+          "low": 0.6410227272727272,
+          "high": 0.8310900968048764
+        }
+      }
+    },
+    "comparisons": {
+      "full minus genomic_only": {
+        "median": -0.019943019943019835,
+        "low": -0.06700611488275793,
+        "high": 0.018538150492264437,
+        "point": -0.02073170731707319,
+        "fraction_of_resamples_favouring_full": 0.1595,
+        "interval_excludes_zero": false
+      }
+    }
+  },
+  {
+    "run": "models\\geo_sweep_str\\holdout_South_Africa",
+    "held_out_isolates": 110,
+    "held_out_resistant": 77,
+    "held_out_susceptible": 33,
+    "bootstrap_resamples_requested": 2000,
+    "bootstrap_resamples_usable": 2000,
+    "confidence_level": 0.95,
+    "models": {
+      "genomic_only": {
+        "roc_auc_point": 0.35871704053522235,
+        "average_precision_point": 0.6602727000058037,
+        "roc_auc_ci": {
+          "median": 0.35819101607347875,
+          "low": 0.226597277132808,
+          "high": 0.49329221520035405
+        }
+      },
+      "full": {
+        "roc_auc_point": 0.3557654466745376,
+        "average_precision_point": 0.6601948087535372,
+        "roc_auc_ci": {
+          "median": 0.35489678920406476,
+          "low": 0.22246393736532377,
+          "high": 0.4985465251444565
+        }
+      }
+    },
+    "comparisons": {
+      "full minus genomic_only": {
+        "median": -0.001355371900826463,
+        "low": -0.046414323962516726,
+        "high": 0.03790723443223443,
+        "point": -0.002951593860684776,
+        "fraction_of_resamples_favouring_full": 0.466,
+        "interval_excludes_zero": false
+      }
+    }
+  }
+]

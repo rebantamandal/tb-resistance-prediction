@@ -1,136 +1,198 @@
-# Using the resistance predictor
+# How to use the predictor
 
-**Research use only.** The models are not clinically validated and the scores are
-uncalibrated. Do not use output to start, stop or change antibiotic treatment.
+Everything you need to run the tool day to day. No biology background assumed —
+where a term is unavoidable, it's explained where it appears.
 
-> Looking for a plain-English explanation with no jargon? See
-> [`EXPLAINED.md`](EXPLAINED.md).
+New to the project entirely? Read [`EXPLAINED.md`](EXPLAINED.md) first.
 
-## The one command
+> **Research use only.** These models are not medically approved and their
+> scores are not probabilities. Never use the output to decide someone's
+> treatment.
+
+---
+
+## The command
 
 ```bat
 .venv\Scripts\python predict_resistance.py ^
-  --variants your_isolates.csv --out predictions.csv --trust-local-models
+  --variants your_file.csv ^
+  --out answers.csv ^
+  --trust-local-models
 ```
 
-`--trust-local-models` is required and deliberate: model files execute code when
-loaded, so you confirm each time that these were produced locally by you.
+On macOS or Linux use `.venv/bin/python`, and `\` instead of `^` for line breaks.
 
-## Input
+**Why `--trust-local-models` is required every time:** the saved model files can
+run code when they're opened. Typing the flag is you confirming these are your
+own files and not something downloaded from a stranger. It's a safety
+speed-bump, not a formality.
 
-One CSV, five columns, one row per variant call per isolate. Any number of
-isolates in one file.
+---
+
+## What goes in
+
+One CSV file. Five columns. **One row per DNA change, per sample.**
+
+```csv
+SAMPLE,CHROM,POS,REF,ALT
+Patient1,NC_000962.3,761155,C,T
+Patient1,NC_000962.3,2155168,C,G
+Patient2,NC_000962.3,1673425,C,T
+```
+
+| Column | What it is |
+|---|---|
+| `SAMPLE` | Your name for the sample. Anything unique. Comes back unchanged. |
+| `CHROM` | Which reference the positions were measured against. See the warning below. |
+| `POS` | *Where* the change is — position number along the DNA. |
+| `REF` | What the letter should be. |
+| `ALT` | What it actually is. |
+
+You won't write this file yourself. It comes out of the DNA sequencing process.
+
+### Rows are not samples
+
+The most common point of confusion. **A single sample takes up thousands of
+rows**, because it has thousands of DNA changes. The example file shipped with
+this repo has 6,781 rows and only 4 samples:
 
 ```text
-SAMPLE,CHROM,POS,REF,ALT
-ERR9001,NC_000962.3,761155,C,T
-ERR9001,NC_000962.3,2155168,C,G
-ERR9002,NC_000962.3,1673425,C,T
+ERR047002     2,496 rows
+ERR047009       728 rows
+ERR1034590    1,774 rows
+ERR1034591    1,783 rows
+              -----
+              6,781 rows  ->  4 samples
 ```
 
-| Column | Meaning |
+A file for 100 patients would be roughly 170,000 rows.
+
+### The one thing that silently breaks it
+
+**Positions must be measured against the reference called `NC_000962.3`.**
+
+Position 761,155 only means something relative to a particular reference
+document. Measured against a different one, the same number points somewhere
+else entirely — and the tool will find nothing it recognises and call everything
+"Susceptible."
+
+That's why the output has a `known_features_present` column. If it reads `0`,
+you have this problem. A `warning` column fills in to tell you.
+
+---
+
+## What comes out
+
+One row per sample:
+
+| Column | What it means |
 |---|---|
-| `SAMPLE` | Your isolate identifier. Anything unique; it is echoed back unchanged. |
-| `CHROM` | Reference contig. Ignored, but positions **must** be called against H37Rv `NC_000962.3`. |
-| `POS` | 1-based position on that reference. |
-| `REF` | Reference allele. |
-| `ALT` | Observed allele. |
+| `isolate_id` | Your sample name, echoed back |
+| `variant_calls_supplied` | How many rows you gave for this sample |
+| `known_features_present` | How many of those the model actually recognised |
+| `<Drug>_call` | **Resistant** (drug will probably fail) or **Susceptible** (will probably work) |
+| `<Drug>_score` | Confidence, 0 to 1. At or above 0.50 becomes Resistant |
+| `warning` | Fills in when nothing was recognised |
 
-This is exactly the format of `all_variants.csv`, so anything that produced the
-training data produces valid input.
+A second file, `answers.report.json`, records the settings used and each model's
+measured accuracy.
 
-**Positions must come from H37Rv.** A different reference silently yields an
-all-zero profile that scores like a susceptible isolate. The tool flags isolates
-with no recognised feature for exactly this reason — treat that flag as "check
-your coordinates", not as a susceptible result.
+### How to read a score
 
-## Output
+`0.80` does **not** mean "80% chance this is resistant." The models were never
+tuned to produce percentages. Use the number as a ranking — higher means more
+confident — and nothing finer.
 
-One row per isolate:
+- **Below 0.4** — fairly confident the drug works
+- **0.4 to 0.6** — the tool is genuinely unsure. These are the ones to send for
+  laboratory testing.
+- **Above 0.6** — fairly confident the drug fails
 
-| Column | Meaning |
-|---|---|
-| `isolate_id` | Your `SAMPLE` value. |
-| `variant_calls_supplied` | How many rows you gave for this isolate. |
-| `known_features_present` | How many of the model's 814 features it carries. |
-| `<Drug>_score` | Uncalibrated resistance score, 0 to 1. |
-| `<Drug>_call` | `Resistant` if the score is at or above the threshold (default 0.50). |
-| `warning` | Set when no known feature was detected. |
+`--threshold 0.3` catches more resistance at the cost of more false alarms.
+`--threshold 0.7` does the reverse. Neither makes the model better; you are
+choosing which kind of mistake you would rather make.
 
-A `.report.json` beside it records the threshold, the feature count, how many
-isolates were flagged, and the measured performance of each model used.
+---
 
-### Reading a score
+## The models
 
-`0.80` is **not** an 80% probability that this infection is resistant. The models
-are not calibrated. What the score supports is ranking and a threshold decision,
-nothing finer. Raising `--threshold` trades sensitivity for specificity; it does
-not make the model better.
-
-## The four models
-
-| Drug | Training labels | Grouped by isolate | Grouped by study | Held-out country |
+| Drug | Samples it learned from | Familiar data | **New hospital** | New country |
 |---|---:|---:|---:|---|
-| Rifampicin | 2,625 | 0.958 | **0.908** | 0.69&ndash;0.76 |
-| Isoniazid | 2,603 | 0.947 | **0.855** | 0.77&ndash;0.94 |
-| Ethambutol | 2,408 | 0.913 | **0.765** | 0.63&ndash;0.84 |
-| Pyrazinamide | 1,839 | 0.911 | **0.782** | 0.63&ndash;0.84 |
+| Rifampicin | 2,625 | 0.958 | **0.908** | 0.69-0.76 |
+| Isoniazid | 2,603 | 0.947 | **0.855** | 0.77-0.94 |
+| Ethambutol | 2,408 | 0.913 | **0.765** | 0.63-0.84 |
+| Pyrazinamide | 1,839 | 0.911 | **0.782** | 0.63-0.84 |
 
-Held-out ROC-AUC. **Use the bold column as your working expectation** &mdash; it is
-what the model scores on isolates from a study it did not train on, which is the
-closest match to routine use. The first column is the figure usually published
-and is the most optimistic; moving to the second costs 0.05&ndash;0.15 AUC
-consistently across all four drugs.
+These numbers are **AUC**: show the tool one resistant and one non-resistant
+sample — how often does it pick correctly? 0.5 is a coin flip, 1.0 is perfect.
 
-The held-out-country column is a **range across several countries, not a
-ceiling**. It is noisy and not uniformly worse: rifampicin drops on every
-country tested, while isoniazid scores 0.936 on held-out Canada against 0.855
-within-cohort. Several intervals span 0.4 or more. See `RESULTS.md` §2 for every
-country result with its interval, and treat any single country figure as weak
-evidence on its own.
+**Plan around the bold column.** The three columns differ because of how the
+model was tested, not because anything about the model changed:
 
-All four share one 814-feature panel, so they can be scored together in a single
-pass. If you retrain one, retrain them all from the same
-`prepare_variants.py` run or the tool will refuse to mix them.
+- **Familiar data** — tested on samples from collections it also trained on.
+  This is the number usually published, and the most flattering, because the
+  model can partly succeed by recognising the collection rather than the disease.
+- **New hospital** — tested on samples from collections it never saw. Costs
+  0.05 to 0.15 across all four drugs, every time. **This is realistic use.**
+- **New country** — a whole country removed from training. These results are
+  noisy and *not* uniformly worse: rifampicin drops on every country tested, but
+  isoniazid scores 0.936 on a country it never saw, better than the 0.855 it
+  manages on familiar data. Treat any single country number as weak evidence.
 
-## Verifying it works
+[`RESULTS.md`](RESULTS.md) has every figure with its margin of error.
+[`EXPLAINED.md`](EXPLAINED.md) explains *why* the columns differ, in plain terms.
 
-The standalone predictor reproduces the training pipeline exactly. Scoring 150
-isolates from the rifampicin model's own held-out set:
+All models share one set of 814 recognised positions, so they run together in a
+single pass. If you retrain one, retrain them all — the tool refuses to mix
+models built from different runs, because their inputs would not line up.
 
-- maximum score difference from the recorded held-out scores: **5e-05**, which is
-  the output rounding
-- resistant/susceptible calls: **150 of 150 identical**
-- against the real laboratory labels for those isolates: accuracy 0.847,
-  ROC-AUC 0.947
+---
 
-Run the software tests with:
+## Proof it works
+
+Running the tool on 150 samples the rifampicin model had been tested on during
+training, then comparing:
+
+- biggest difference in score: **0.00005** — just decimal rounding
+- Resistant/Susceptible decisions: **150 out of 150 identical**
+- against the real laboratory results: **84.7% correct**
+
+A fresh download of this repository was also checked: it runs the predictor and
+the full test suite with nothing extra to install, producing identical numbers.
+
+Run the software tests yourself:
 
 ```bat
 .venv\Scripts\python -m unittest discover -s tests
 ```
 
-69 tests, covering feature-name reproducibility across processes, locus
-annotation margins, label handling, metadata normalisation, phenotype merging
-and the predictor's matrix construction.
+69 tests. They check the software behaves correctly — not that the predictions
+are medically accurate.
 
-## Retraining or adding a drug
+---
 
-Labels already exist for eleven more drugs in `data/phenotypes.csv`
-(streptomycin 1,573; amikacin 1,163; capreomycin 936; and others). To add one:
+## Adding another drug
+
+Laboratory results already exist in `data/phenotypes.csv` for several drugs
+beyond the ones shipped, including amikacin (1,163 samples), capreomycin (936)
+and kanamycin (719). No new data needed.
 
 ```bat
-.venv\Scripts\python run_full_study.py --drugs STREPTOMYCIN
+.venv\Scripts\python run_full_study.py --drugs AMIKACIN
 ```
 
-Then add an entry to `DEFAULT_REGISTRY` in `predict_resistance.py`, or pass your
-own registry JSON with `--registry`.
+That trains the model and measures it three ways. Then add a few lines to
+`DEFAULT_REGISTRY` near the top of `predict_resistance.py`, copying the pattern
+of an existing entry, and it appears in the output alongside the others.
 
-## Troubleshooting
+---
 
-| Symptom | Cause |
+## When something goes wrong
+
+| What you see | What it means |
 |---|---|
-| "expects different features from" | Models came from different `prepare_variants.py` runs. Retrain them from one panel. |
-| Every isolate flagged, all scores low | Positions are not H37Rv coordinates, or the file is empty of resistance-locus variants. |
-| "Environment differs from the one these models were fitted in" | Your scikit-learn/pandas/numpy differ from training. Pin `requirements.txt` or retrain. |
-| "already exists" | Output paths are never overwritten. Choose a new filename. |
+| Every sample says `Susceptible` and `known_features_present` is 0 | Your positions are not measured against `NC_000962.3`. By far the most common problem. |
+| `expects different features from` | Your models came from different training runs. Retrain them together. |
+| `Environment differs from the one these models were fitted in` | Your installed library versions differ from the ones used for training. Reinstall from `requirements.txt`, or retrain. |
+| `already exists` | The tool never overwrites results. Pick a new output filename. |
+| `Pass --trust-local-models` | You left the safety flag off. Add it. |

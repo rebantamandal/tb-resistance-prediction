@@ -19,12 +19,14 @@ On macOS or Linux, use `.venv/bin/python` and `\` line continuations.
 ## What you should see
 
 ```text
-isolate_id   known_features  Rifampicin   score   Isoniazid    score
-ERR1034590   30              Resistant    0.9062  Resistant    0.9797
-ERR1034591   30              Resistant    0.8491  Resistant    0.8948
-ERR047002    41              Susceptible  0.2473  Resistant    0.7360
-ERR047009     5              Susceptible  0.1746  Susceptible  0.1584
+isolate_id   known_features  Rifampicin   score   Isoniazid    score   Streptomycin  score
+ERR1034590   30              Resistant    0.91    Resistant    0.98    Resistant     0.68
+ERR1034591   30              Resistant    0.85    Resistant    0.89    Susceptible   0.43
+ERR047002    41              Susceptible  0.25    Resistant    0.74    Susceptible   0.24
+ERR047009     5              Susceptible  0.17    Susceptible  0.16    Susceptible   0.27
 ```
+
+All five drugs are scored; only three are shown here for width.
 
 Against the real laboratory rifampicin results, all four calls are correct:
 

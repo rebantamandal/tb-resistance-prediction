@@ -1,5 +1,5 @@
-isolate_id,variant_calls_supplied,known_features_present,Ethambutol_score,Ethambutol_call,Isoniazid_score,Isoniazid_call,Pyrazinamide_score,Pyrazinamide_call,Rifampicin_score,Rifampicin_call,warning
-ERR047002,2496,41,0.1889,Susceptible,0.736,Resistant,0.1582,Susceptible,0.2473,Susceptible,
-ERR047009,728,5,0.1987,Susceptible,0.1584,Susceptible,0.1801,Susceptible,0.1746,Susceptible,
-ERR1034590,1774,30,0.755,Resistant,0.9797,Resistant,0.7179,Resistant,0.9062,Resistant,
-ERR1034591,1783,30,0.4529,Susceptible,0.8948,Resistant,0.6921,Resistant,0.8491,Resistant,
+isolate_id,variant_calls_supplied,known_features_present,Ethambutol_score,Ethambutol_call,Isoniazid_score,Isoniazid_call,Pyrazinamide_score,Pyrazinamide_call,Rifampicin_score,Rifampicin_call,Streptomycin_score,Streptomycin_call,warning
+ERR047002,2496,41,0.1889,Susceptible,0.736,Resistant,0.1582,Susceptible,0.2473,Susceptible,0.2426,Susceptible,
+ERR047009,728,5,0.1987,Susceptible,0.1584,Susceptible,0.1801,Susceptible,0.1746,Susceptible,0.2731,Susceptible,
+ERR1034590,1774,30,0.755,Resistant,0.9797,Resistant,0.7179,Resistant,0.9062,Resistant,0.681,Resistant,
+ERR1034591,1783,30,0.4529,Susceptible,0.8948,Resistant,0.6921,Resistant,0.8491,Resistant,0.4316,Susceptible,

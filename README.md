@@ -1,49 +1,48 @@
 # TB Resistance Prediction
 
-Predict *Mycobacterium tuberculosis* drug resistance from whole-genome variant
-calls. Four trained Random Forest models — rifampicin, isoniazid, ethambutol and
-pyrazinamide — plus the full pipeline that built them, from a 15-million-row
-variant table to a one-command predictor.
+**Predict whether an antibiotic will work against a tuberculosis infection, by
+reading the bacterium's DNA.**
+
+Five trained models — rifampicin, isoniazid, ethambutol, pyrazinamide and
+streptomycin — plus everything used to build them.
 
 ```bash
-python predict_resistance.py --variants your_isolates.csv --out predictions.csv --trust-local-models
+python predict_resistance.py --variants your_samples.csv --out answers.csv --trust-local-models
 ```
 
 ```text
-isolate_id   Rifampicin_call  Rifampicin_score  Isoniazid_call  Isoniazid_score
-ERR038736    Resistant        0.5360            Resistant       0.8330
-SRR998857    Resistant        0.8552            Resistant       0.9418
-ERR038266    Susceptible      0.0592            Susceptible     0.1320
+sample       Rifampicin   score   Isoniazid    score
+ERR1034590   Resistant    0.91    Resistant    0.98
+ERR047009    Susceptible  0.17    Susceptible  0.16
 ```
 
 > ### ⚠️ Research use only
 >
-> These models are **not clinically validated** and their scores are
-> **uncalibrated**. A score of 0.80 is not an 80% probability that an infection
-> is resistant. Do not use any output here to select, start, stop or change
-> antibiotic treatment. Culture-based drug susceptibility testing remains the
-> reference standard.
+> These models are **not medically approved**. The scores are **not
+> probabilities** — 0.80 does not mean an 80% chance. Never use this output to
+> decide anyone's treatment. Growing the bacteria in a laboratory remains the
+> real test.
 
-> **New to this, or not from a biology background?** Read
-> **[`EXPLAINED.md`](EXPLAINED.md)** — the whole project in plain English, with
-> no jargon: what the tool does, how to read its output, and what the results
-> mean.
+> **New to this, or not from a biology background?**
+> **[`EXPLAINED.md`](EXPLAINED.md)** covers the whole project in plain English —
+> what it does, how to read the output, and what the results mean.
 
 ---
 
-## Why this exists
+## The problem it addresses
 
-Tuberculosis drug susceptibility testing takes **2–8 weeks** because TB grows
-slowly. Sequencing takes **1–2 days**. In between, patients are treated on a
-guess — and if the guess is wrong they stay sick and infectious.
+To find out whether an antibiotic works against someone's TB infection, the
+standard method is to grow the bacteria in a laboratory alongside the drug and
+see whether it survives. **That takes 2 to 8 weeks**, because TB grows slowly.
 
-Resistance in TB is driven by mutations in a small, known set of genes (`rpoB`
-for rifampicin, `katG` for isoniazid, and so on), which is what makes prediction
-from a genome tractable at all.
+Reading the DNA takes **1 to 2 days**.
+
+In between, a patient is treated on a guess. This project tests whether the DNA
+can give a useful answer in the meantime.
 
 ---
 
-## Quick start
+## Getting started
 
 Python 3.11 or newer.
 
@@ -56,292 +55,238 @@ python -m venv .venv
 # .venv/bin/python -m pip install -r requirements.txt     # macOS / Linux
 ```
 
-The four trained models are included in the clone, so you can predict
-immediately — no training and no 555 MB download required:
+The trained models are included, so you can predict straight away. **No large
+download needed.**
+
+### Try it now
+
+A ready-made example ships with the repo:
 
 ```bash
 .venv/Scripts/python predict_resistance.py \
-  --variants your_isolates.csv \
-  --out predictions.csv \
+  --variants examples/sample_isolates.csv \
+  --out test.csv \
   --trust-local-models
 ```
 
-`--trust-local-models` is required every time and deliberately so: model files
-execute code when loaded, so you confirm each run that these are files you trust.
-
-### Try it right now
-
-The repository ships four real isolates with known laboratory results:
-
-```bash
-.venv/Scripts/python predict_resistance.py   --variants examples/sample_isolates.csv   --out my_predictions.csv   --trust-local-models
-```
-
 ```text
-isolate_id   known_features  Rifampicin   score   Isoniazid    score
-ERR1034590   30              Resistant    0.9062  Resistant    0.9797
-ERR1034591   30              Resistant    0.8491  Resistant    0.8948
-ERR047002    41              Susceptible  0.2473  Resistant    0.7360
-ERR047009     5              Susceptible  0.1746  Susceptible  0.1584
+sample       features  Rifampicin   score   Isoniazid    score
+ERR1034590   30        Resistant    0.91    Resistant    0.98
+ERR1034591   30        Resistant    0.85    Resistant    0.89
+ERR047002    41        Susceptible  0.25    Resistant    0.74
+ERR047009     5        Susceptible  0.17    Susceptible  0.16
 ```
 
-All four were in the rifampicin model's held-out test set, and all four
-rifampicin calls match the real laboratory result. See
-[`examples/`](examples/) for details.
+Those four samples have known laboratory results and the models never trained on
+them. **All four rifampicin predictions are correct.** See
+[`examples/`](examples/).
 
 ---
 
-## Input format
+## What you feed it
 
-One CSV, five columns, one row per variant call per isolate. Any number of
-isolates per file.
+One CSV. Five columns. **One row per DNA change, per sample.**
 
 ```csv
 SAMPLE,CHROM,POS,REF,ALT
-ERR9001,NC_000962.3,761155,C,T
-ERR9001,NC_000962.3,2155168,C,G
-ERR9002,NC_000962.3,1673425,C,T
+Patient1,NC_000962.3,761155,C,T
+Patient1,NC_000962.3,2155168,C,G
 ```
 
 | Column | Meaning |
 |---|---|
-| `SAMPLE` | Your isolate identifier. Anything unique; echoed back unchanged. |
-| `CHROM` | Reference contig. Not used, but see the warning below. |
-| `POS` | 1-based position on the reference. |
-| `REF` | Reference allele. |
-| `ALT` | Observed allele. |
+| `SAMPLE` | Your name for the sample |
+| `CHROM` | Which reference the positions were measured against |
+| `POS` | Where the change is — a position number along the DNA |
+| `REF` | What the letter should be |
+| `ALT` | What it actually is |
 
-> **Positions must be called against H37Rv (`NC_000962.3`).** A different
-> reference produces an all-zero feature profile that scores like a susceptible
-> isolate. The tool flags any isolate carrying no recognised feature — treat that
-> flag as "check your coordinates", never as a susceptible result.
+You don't write this by hand; it comes out of the DNA sequencing process.
 
-## Output
+**Rows are not samples.** One sample takes thousands of rows, because it has
+thousands of DNA changes. The example file has 6,781 rows and just 4 samples.
 
-One row per isolate, with a score and a call for every drug:
+> ⚠️ **Positions must be measured against the reference `NC_000962.3`.** A
+> position number only means something relative to a particular reference. With
+> the wrong one, the tool recognises nothing and calls everything "Susceptible."
+> The `known_features_present` column tells you if this happened — if it's `0`,
+> that's the problem.
+
+## What you get back
 
 | Column | Meaning |
 |---|---|
-| `isolate_id` | Your `SAMPLE` value |
-| `variant_calls_supplied` | Rows you provided for this isolate |
-| `known_features_present` | How many of the model's 814 features it carries |
-| `<Drug>_score` | Uncalibrated resistance score, 0–1 |
-| `<Drug>_call` | `Resistant` at or above the threshold (default 0.50) |
-| `warning` | Set when no known resistance feature was detected |
+| `isolate_id` | Your sample name |
+| `known_features_present` | How many recognisable DNA changes were found |
+| `<Drug>_call` | **Resistant** (drug will probably fail) or **Susceptible** |
+| `<Drug>_score` | Confidence, 0 to 1. At or above 0.50 becomes Resistant. |
+| `warning` | Fills in when nothing was recognised |
 
-A `.report.json` is written alongside, recording the threshold, feature count,
-flagged isolates, and the measured performance of every model used.
+Scores between **0.4 and 0.6** mean the tool is genuinely unsure — those are the
+ones to send for laboratory testing.
 
 ---
 
-## How well does it work?
+## How accurate is it?
 
-Held-out ROC-AUC with 95% bootstrap intervals. **Same models, same features —
-only the train/test split changes.**
-
-| Drug | Labels | Grouped by isolate | Grouped by study | Held-out country |
+| Drug | Samples learned from | Familiar hospitals | **New hospital** | New country |
 |---|---:|---:|---:|---|
 | Rifampicin | 2,625 | 0.958 | **0.908** | 0.69–0.76 |
+| Streptomycin | 1,573 | 0.948 | **0.897** | 0.36–0.86 |
 | Isoniazid | 2,603 | 0.947 | **0.855** | 0.77–0.94 |
 | Ethambutol | 2,408 | 0.913 | **0.765** | 0.63–0.84 |
 | Pyrazinamide | 1,839 | 0.911 | **0.782** | 0.63–0.84 |
 
-**Use the bold column as your working expectation.** It is what the model scores
-on isolates from a study it never trained on — the closest match to routine use.
+These are **AUC** scores: show the tool one resistant and one non-resistant
+sample — how often does it pick correctly? 0.5 is a coin flip, 1.0 is perfect.
 
-### What the columns mean
+**Plan around the bold column.** Here's why the columns differ:
 
-- **Grouped by isolate** — the protocol usually reported in the literature.
-  Isolates from one study land on both sides of the split, so the model can
-  partly recognise the cohort rather than the biology.
-- **Grouped by study** — no study straddles the split. This costs **0.05–0.15
-  AUC across all four drugs**, with non-overlapping intervals every time. This
-  is the project's most robust finding.
-- **Held-out country** — an entire country excluded from training. Results here
-  are **mixed and noisy**, not a uniform collapse. Rifampicin drops on all three
-  countries tested (Canada 0.686 [0.565, 0.799]). Isoniazid does the opposite,
-  scoring 0.936 on held-out Canada against 0.855 within-cohort. Six of fourteen
-  country results beat their study-grouped figure, and several intervals span
-  0.4 or more.
+- **Familiar hospitals** — tested on samples from collections it also trained
+  on. This is the figure usually published, and the most flattering: the model
+  can partly succeed by recognising the *collection* rather than the disease.
+- **New hospital** — tested on collections it has never seen. This costs
+  **0.05 to 0.15 across all five drugs**, every time, with no overlap in the
+  margins of error. **This is the project's main finding**, and it's what
+  realistic use looks like.
+- **New country** — a whole country removed from training. Noisy and *not*
+  uniformly worse. Isoniazid scores 0.936 on a country it never saw. But
+  streptomycin scores **0.359 on South Africa — worse than guessing**, a real
+  warning that the tool can fail badly on an unfamiliar population.
 
-Full per-country results with intervals are in [`RESULTS.md`](RESULTS.md) §2.
+Full numbers with margins of error: [`RESULTS.md`](RESULTS.md). Why the columns
+differ, explained simply: [`EXPLAINED.md`](EXPLAINED.md).
 
-### It learns real biology
+### It learned real biology
 
-Permutation importance on the rifampicin model ranks **rpoB Ser450Leu** — the
-dominant rifampicin resistance mutation worldwide — far above every other
-feature, at roughly twice the next. The pipeline recovered it from raw genomic
-coordinates without being told what to look for.
+Ask the rifampicin model which DNA position mattered most, and it points to
+**the exact mutation medicine has known causes rifampicin resistance for
+decades** — about twice as important as anything else. Nobody told it where to
+look; it found that from raw position numbers.
 
-### Verified against the training pipeline
+### It's been verified
 
-Scoring 150 isolates from the rifampicin model's own held-out set through the
-standalone predictor:
-
-- maximum score difference from the recorded values: **5 × 10⁻⁵** (output rounding)
-- resistant/susceptible calls: **150 of 150 identical**
-- against real laboratory labels: accuracy **0.847**, ROC-AUC **0.947**
-
-A fresh `git clone` of this repository was verified to run the predictor and the
-full test suite with no extra downloads, producing byte-identical scores.
+- Re-scoring 150 samples the model was tested on during training: **150 of 150
+  identical decisions**, biggest score difference 0.00005 (rounding).
+- A fresh download of this repository runs the predictor and all 69 software
+  tests with nothing extra to install, producing identical numbers.
 
 ---
 
 ## How it was built
 
 ```text
-all_variants.csv                    15,057,917 variant calls, 9,842 isolates, no labels
-        │
-        ├─ prepare_variants.py      long → wide; 43 resistance loci + 200 bp promoter
-        │                           margins; drop variants in <20 isolates
-        │                           → 9,842 × 814 binary feature matrix
-        │
-        ├─ fetch_sample_metadata.py real country / city / specimen from the ENA API
-        │
-        ├─ fetch_phenotypes.py      laboratory DST from BV-BRC (lab evidence only)
-        ├─ build_phenotype_table.py + CRyPTIC + NCBI Pathogen Detection
-        │                           → 2,664 isolates with real labels
-        │
-        └─ amr.py train             Random Forest, 300 trees, group-disjoint split
-                                    → the four models in models/
+all_variants.csv          15 million DNA changes, 9,842 samples, NO answers
+        |
+        |-- prepare_variants.py       find the 814 DNA positions that matter
+        |                             (out of 758,768 present)
+        |
+        |-- fetch_sample_metadata.py  collect sample details from a public database
+        |
+        |-- fetch_phenotypes.py       recover real laboratory answers from
+        |-- build_phenotype_table.py  three public medical databases
+        |                             -> 2,664 samples with real answers
+        |
+        |-- amr.py train              train the models
 ```
 
-**The source dataset ships no labels.** [FORUM-TB on Kaggle](https://www.kaggle.com/datasets/nanzhen/forum-tb)
-advertises "4 drug resistance labels" and "247 KB compressed", but the published
-file is 555 MB of unlabelled variant calls. Labels were recovered independently
-from three public sources of laboratory susceptibility testing, joined by
-sequencing run accession:
-
-| Source | Isolates |
-|---|---:|
-| BV-BRC `genome_amr` (laboratory evidence only) | 2,408 |
-| CRyPTIC reuse table | 257 |
-| NCBI Pathogen Detection `AST_phenotypes` | 79 |
-
-Computational predictions were excluded at the query — training on another
-model's output would be circular. Where BV-BRC and NCBI cover the same
-isolate-drug pair, they **agree on 323 of 323 results**, so label noise is not
-what limits the numbers above.
+**The source dataset advertised answers it didn't contain.**
+[FORUM-TB on Kaggle](https://www.kaggle.com/datasets/nanzhen/forum-tb) describes
+"4 drug resistance labels" in a "247 KB" file; what's actually published is
+555 MB of DNA changes with no answers at all. The answers here were recovered
+independently from BV-BRC, CRyPTIC and NCBI Pathogen Detection — laboratory
+results only, never other software's predictions.
 
 ---
 
-## Repository layout
+## What's in this repository
+
+**Start here**
+
+| File | What it's for |
+|---|---|
+| [`EXPLAINED.md`](EXPLAINED.md) | The whole project in plain English |
+| [`USAGE.md`](USAGE.md) | Day-to-day reference: commands, formats, troubleshooting |
+| [`RESULTS.md`](RESULTS.md) | Every number, with margins of error |
+| [`examples/`](examples/) | A file you can run immediately |
+
+**The tools**
+
+| File | What it does |
+|---|---|
+| `predict_resistance.py` | **The predictor.** DNA in, answers out. |
+| `prepare_variants.py` | Turns raw DNA changes into a table models can use |
+| `fetch_sample_metadata.py` | Collects sample details from the ENA public database |
+| `fetch_phenotypes.py` | Collects laboratory answers from BV-BRC |
+| `build_phenotype_table.py` | Merges answers from three databases, tracking sources |
+| `run_full_study.py` | Trains and tests a drug all three ways |
+| `geographic_sweep.py` | Tests each country separately |
+| `analyze_runs.py` | Calculates margins of error |
+| `amr.py` | The underlying model trainer |
+| `app.py` | Optional browser interface, if you'd rather not use the command line |
+
+**The data that ships with it**
 
 | Path | What it is |
 |---|---|
-| `predict_resistance.py` | **The predictor.** Variants in, per-drug predictions out. |
-| `prepare_variants.py` | Builds the isolate × variant feature matrix from raw calls. |
-| `fetch_sample_metadata.py` | Real country, city and specimen from the ENA portal API. |
-| `fetch_phenotypes.py` | Laboratory DST from BV-BRC. |
-| `build_phenotype_table.py` | Merges the three label sources, with provenance and agreement. |
-| `run_full_study.py` | Runs the whole evaluation ladder for any drug. |
-| `geographic_sweep.py` | Holds out each country in turn. |
-| `analyze_runs.py` | Paired bootstrap confidence intervals on saved runs. |
-| `amr.py` | The underlying Random Forest trainer and CLI. |
-| `app.py` | Optional local browser interface for training and prediction. |
-| `models/*_genomic_baseline/` | The four released models, with their reports. |
-| `resources/tb_resistance_loci.csv` | 43 H37Rv resistance loci with drug associations. |
-| `data/phenotypes.csv` | Recovered laboratory labels, 15 drugs, with per-label source. |
-| `data/sample_metadata.csv` | ENA metadata for all 9,842 accessions. |
-| `data/variant_panel/feature_dictionary.csv` | Every feature's position, alleles and gene. |
+| `models/*_genomic_baseline/` | The five trained models |
+| `data/phenotypes.csv` | Recovered laboratory answers, 15 drugs, with sources |
+| `data/sample_metadata.csv` | Sample details for all 9,842 samples |
+| `data/variant_panel/feature_dictionary.csv` | The 814 DNA positions the models use |
+| `resources/` | The reference tables the pipeline needs |
 
-Documentation: [`EXPLAINED.md`](EXPLAINED.md) (plain-English guide, start here) ·
-[`USAGE.md`](USAGE.md) (day-to-day use) ·
-[`RESULTS.md`](RESULTS.md) (what was measured and how) ·
-[`DATA_PIPELINE.md`](DATA_PIPELINE.md) (how the data was assembled) ·
-[`TESTING.md`](TESTING.md).
+Working folders are rebuilt by the commands in [`RESULTS.md`](RESULTS.md) §8
+rather than stored here, to keep the download small.
 
 ---
 
-## Reproducing from scratch
+## Adding another drug
 
-Download `all_variants.csv` from [FORUM-TB](https://www.kaggle.com/datasets/nanzhen/forum-tb)
-into the project root, then:
+Laboratory answers already exist for several more drugs in `data/phenotypes.csv`
+— amikacin (1,163 samples), capreomycin (936), kanamycin (719) and others. No
+new data needed:
 
 ```bash
-# 1. Feature matrix (~5 min, two streaming passes over 555 MB)
-python prepare_variants.py --variants all_variants.csv \
-  --out-dir data/variant_panel --min-prevalence 20
-
-# 2. Metadata and labels (public APIs, no account needed)
-python fetch_sample_metadata.py \
-  --accessions data/variant_panel/isolate_variant_matrix.csv \
-  --out data/sample_metadata.csv
-python fetch_phenotypes.py --out data/phenotype_sources/bvbrc_phenotypes.csv \
-  --accessions data/variant_panel/isolate_variant_matrix.csv
-python build_phenotype_table.py \
-  --bvbrc data/phenotype_sources/bvbrc_phenotypes.csv \
-  --accessions data/variant_panel/isolate_variant_matrix.csv \
-  --out data/phenotypes.csv
-
-# 3. Train and evaluate any drug
-python run_full_study.py --drugs RIFAMPICIN ISONIAZID ETHAMBUTOL PYRAZINAMIDE
-
-# 4. Confidence intervals
-python analyze_runs.py --runs models/rif_genomic_baseline
+python run_full_study.py --drugs AMIKACIN
 ```
 
-Labels already exist for eleven more drugs in `data/phenotypes.csv`
-(streptomycin 1,573; amikacin 1,163; capreomycin 936; and others). Add one with
-`run_full_study.py --drugs STREPTOMYCIN`, then register it in
-`DEFAULT_REGISTRY` in `predict_resistance.py`.
-
-### Tests
-
-```bash
-python -m unittest discover -s tests
-```
-
-69 tests, covering feature-name reproducibility across processes, locus
-annotation margins, label handling, metadata normalisation, phenotype merging
-and the predictor's matrix construction.
+Then add a short entry to `DEFAULT_REGISTRY` in `predict_resistance.py`, copying
+an existing one, and it appears in the output alongside the rest.
 
 ---
 
-## Limitations
+## Known limitations
 
-- **Not calibrated.** Scores rank isolates; they are not probabilities.
-- **Trained on an unusual population.** 65% of isolates carry the katG isoniazid
-  mutation. Resistance prevalence here is far above community TB, so precision
-  will not transfer to a screening setting unchanged.
-- **Drops sharply across geography.** ~0.91 within a familiar population,
-  ~0.69–0.84 on an unseen country. Validate locally before trusting it anywhere new.
-- **H37Rv coordinates only.** Other references silently yield empty profiles.
-- **No call-quality filtering.** The source carries no depth or genotype-quality
-  fields, so every variant call is taken at face value.
-- **No patient identifiers** exist in the source, so repeat isolates from one
-  patient may cross a split, flattering every figure slightly.
-- **27% label coverage** — 2,664 of 9,842 isolates. More labels would tighten
-  every interval.
-- **Clinical features are mostly unavailable.** Age, prior antibiotic exposure
-  and hospitalisation duration are not recorded for these accessions in any
-  public source, and were not invented. Only infection site was obtainable.
-- **Geography and clinical features could not be evaluated.** Every study in
-  this cohort sits in exactly one country (Cramér's V between study and country
-  = 1.000), so "which country" and "which cohort" are the same variable. Group
-  the split by isolate and country becomes a cohort lookup (+0.017 AUC); group
-  it by study and country is an unseen category carrying nothing (−0.039 AUC).
-  Both intervals exclude zero and they disagree in sign, because each measures a
-  different artefact. The released models are genomic-only for that reason — not
-  because geography is irrelevant to resistance, which remains untested here.
-  See [`RESULTS.md`](RESULTS.md) §3.
+- **Scores aren't probabilities.** Use them as rankings.
+- **The training samples are unusual** — about two thirds carry a major
+  resistance mutation, far above a normal population. Accuracy on ordinary
+  patients is untested.
+- **It can fail badly on an unfamiliar population.** Streptomycin scored below
+  chance on South African samples.
+- **Positions must use the `NC_000962.3` reference** or nothing is recognised.
+- **Only 27% of samples had laboratory answers**, which limits how precise the
+  measurements can be.
+- **Patient details mostly don't exist.** Age, previous treatment and hospital
+  stay aren't recorded publicly for these samples, and weren't invented.
+- **Location couldn't be evaluated.** Every collection in this data comes from
+  exactly one country, so "which country" and "which hospital" are the same
+  information. See [`RESULTS.md`](RESULTS.md) §4.
 
 ---
 
-## Data sources and attribution
+## Data sources and licence
 
 | Source | Used for | Terms |
 |---|---|---|
-| [FORUM-TB](https://www.kaggle.com/datasets/nanzhen/forum-tb) | Variant calls | CC BY-SA 4.0 |
-| [ENA Portal API](https://www.ebi.ac.uk/ena/portal/api/) | Sample metadata | Open |
-| [BV-BRC](https://www.bv-brc.org/) | Laboratory DST | Public |
-| [CRyPTIC](https://ftp.ebi.ac.uk/pub/databases/cryptic/) | Laboratory DST | See their [data compendium](https://doi.org/10.1101/2021.09.14.460274) |
-| [NCBI Pathogen Detection](https://www.ncbi.nlm.nih.gov/pathogens/) | Laboratory DST | Public domain |
-| [WHO mutation catalogue, 2nd ed.](https://www.who.int/publications/i/item/9789240082410) | Locus annotation reference | — |
+| [FORUM-TB](https://www.kaggle.com/datasets/nanzhen/forum-tb) | DNA changes | CC BY-SA 4.0 |
+| [ENA Portal](https://www.ebi.ac.uk/ena/portal/api/) | Sample details | Open |
+| [BV-BRC](https://www.bv-brc.org/) | Laboratory answers | Public |
+| [CRyPTIC](https://ftp.ebi.ac.uk/pub/databases/cryptic/) | Laboratory answers | See their [data paper](https://doi.org/10.1101/2021.09.14.460274) |
+| [NCBI Pathogen Detection](https://www.ncbi.nlm.nih.gov/pathogens/) | Laboratory answers | Public domain |
+| [WHO mutation catalogue](https://www.who.int/publications/i/item/9789240082410) | Reference for which DNA regions matter | — |
 
-The source variant data is CC BY-SA 4.0. The feature matrix, feature dictionary
-and trained models are derived from it and are shared under the **same
-CC BY-SA 4.0 terms**. The code in this repository is MIT licensed — see
+Code is MIT licensed. The trained models and DNA-derived data are built from a
+CC BY-SA 4.0 source and are shared under those same terms. See
 [`LICENSE`](LICENSE).
 
 ## Citation
@@ -349,12 +294,11 @@ CC BY-SA 4.0 terms**. The code in this repository is MIT licensed — see
 ```bibtex
 @software{mandal_tb_resistance_prediction,
   author = {Mandal, Rebanta},
-  title  = {TB Resistance Prediction: Random Forest models for
-            M. tuberculosis drug resistance from whole-genome variants},
+  title  = {TB Resistance Prediction: predicting M. tuberculosis drug
+            resistance from whole-genome variants},
   url    = {https://github.com/rebantamandal/tb-resistance-prediction},
   year   = {2026}
 }
 ```
 
-Please also cite the underlying data sources above, particularly the CRyPTIC
-data compendium and the FORUM-TB dataset.
+Please cite the underlying data sources above as well.
