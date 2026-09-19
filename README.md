@@ -64,6 +64,26 @@ immediately — no training and no 555 MB download required:
 `--trust-local-models` is required every time and deliberately so: model files
 execute code when loaded, so you confirm each run that these are files you trust.
 
+### Try it right now
+
+The repository ships four real isolates with known laboratory results:
+
+```bash
+.venv/Scripts/python predict_resistance.py   --variants examples/sample_isolates.csv   --out my_predictions.csv   --trust-local-models
+```
+
+```text
+isolate_id   known_features  Rifampicin   score   Isoniazid    score
+ERR1034590   30              Resistant    0.9062  Resistant    0.9797
+ERR1034591   30              Resistant    0.8491  Resistant    0.8948
+ERR047002    41              Susceptible  0.2473  Resistant    0.7360
+ERR047009     5              Susceptible  0.1746  Susceptible  0.1584
+```
+
+All four were in the rifampicin model's held-out test set, and all four
+rifampicin calls match the real laboratory result. See
+[`examples/`](examples/) for details.
+
 ---
 
 ## Input format

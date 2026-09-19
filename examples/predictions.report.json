@@ -1,0 +1,36 @@
+{
+  "generated_utc": "2026-09-19T05:16:40+00:00",
+  "notice": "RESEARCH ONLY. Uncalibrated scores, not clinically validated. Not a patient's probability of resistance. Do not use for treatment decisions.",
+  "variant_file": "examples\\sample_isolates.csv",
+  "isolates_scored": 4,
+  "threshold": 0.5,
+  "feature_count": 814,
+  "isolates_with_no_known_feature": 0,
+  "models": {
+    "Ethambutol": {
+      "run": "models\\eth_genomic_baseline",
+      "held_out_auc_random_split": 0.913,
+      "held_out_auc_study_grouped": 0.765,
+      "auc_on_an_unseen_country": "0.63-0.84"
+    },
+    "Isoniazid": {
+      "run": "models\\iso_genomic_baseline",
+      "held_out_auc_random_split": 0.947,
+      "held_out_auc_study_grouped": 0.855,
+      "auc_on_an_unseen_country": "0.77-0.94"
+    },
+    "Pyrazinamide": {
+      "run": "models\\pyr_genomic_baseline",
+      "held_out_auc_random_split": 0.911,
+      "held_out_auc_study_grouped": 0.782,
+      "auc_on_an_unseen_country": "0.63-0.84"
+    },
+    "Rifampicin": {
+      "run": "models\\rif_genomic_baseline",
+      "held_out_auc_random_split": 0.958,
+      "held_out_auc_study_grouped": 0.908,
+      "auc_on_an_unseen_country": "0.69-0.76"
+    }
+  },
+  "how_to_read_the_performance_figures": "The random-split figure is the one usually quoted and is the most optimistic. The study-grouped figure is what to expect on isolates from a cohort the model did not train on, and is the figure to plan around. The unseen-country entry is a RANGE across several countries, not a floor: it is noisy and not uniformly worse than the study-grouped figure. Rifampicin drops on every country tested, while isoniazid scores above its study-grouped value on two of four. Treat any single country figure as weak evidence; see RESULTS.md section 2."
+}

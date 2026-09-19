@@ -35,4 +35,5 @@ models/*/split_assignments.csv
 # Local scratch
 local_data/
 predictions*.csv
+!examples/predictions.csv
 *.log
