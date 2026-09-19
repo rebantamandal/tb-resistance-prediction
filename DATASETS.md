@@ -14,7 +14,15 @@ here was checked directly rather than assumed.
 
 ---
 
-## 1. CRyPTIC — the best single option
+## 1. CRyPTIC — used, and it delivered
+
+> **Status: done.** This was acted on. `prepare_cryptic.py` builds a matrix from
+> the CRyPTIC tables, and the results are in [`RESULTS.md`](RESULTS.md) §4. It
+> confirmed the project's main finding on 45,141 samples instead of 2,625, and
+> its lineage records disproved the explanation the project had been offering
+> for that finding. Both outcomes were worth the download.
+
+
 
 **What it is:** a research consortium that collected TB samples from 23
 countries and tested them all **using one standardised laboratory method**.
@@ -153,13 +161,13 @@ sitting in the same place, unused.
 
 ## What to do with limited time
 
-1. **Download CRyPTIC's `GENOMES.csv.gz` (5 MB) and check the site-to-country
-   mapping.** One afternoon. If sites span countries, the project's original
-   question becomes answerable and that changes the whole write-up.
-2. **Use CRyPTIC's lineage data to test the population-structure explanation.**
-   The project's central claim is that the model recognises collections rather
-   than biology. Holding out a whole lineage would test that directly instead of
-   inferring it.
+1. ~~Check CRyPTIC's site-to-country mapping.~~ **Done.** Every site sits in one
+   country, so geography stays inseparable from collection even there. What
+   CRyPTIC does remove is the differing laboratory protocol.
+2. ~~Use CRyPTIC's lineage data to test the population-structure explanation.~~
+   **Done, and it refuted the explanation.** Holding out entire lineages costs
+   nothing, so genetic relatedness is not why the model recognises collections.
+   See [`RESULTS.md`](RESULTS.md) §4.
 3. **Request TB Portals access** if clinical features genuinely matter to the
    project. It is the only route, and the request takes time, so start early.
 4. **Map the model's features to WHO mutation names.** Cheap, and it makes the

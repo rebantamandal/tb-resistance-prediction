@@ -6,9 +6,11 @@ __pycache__/
 .pytest_cache/
 .ipynb_checkpoints/
 
-# Source data: 555 MB, redistributed by its publisher, not by this repo.
-# Download it from Kaggle (see README) and place it in the project root.
+# Source data, redistributed by its publishers rather than by this repo.
+# all_variants.csv is 555 MB from Kaggle; data/cryptic/ is 1.4 GB from the
+# CRyPTIC FTP. Both are fetched by the commands in DATASETS.md.
 all_variants.csv
+data/cryptic/
 
 # Everything under data/ is a rebuildable working file, EXCEPT the few below
 # that the predictor and the documentation actually need. prepare_variants.py

@@ -174,6 +174,24 @@ Ask the rifampicin model which DNA position mattered most, and it points to
 decades** — about twice as important as anything else. Nobody told it where to
 look; it found that from raw position numbers.
 
+### Confirmed on independent data
+
+The main finding — that splitting by collection rather than randomly costs
+0.05–0.15 AUC — was re-tested on the **CRyPTIC** dataset: separate samples,
+**seventeen times larger** (45,141 rifampicin samples against 2,625).
+
+| Drug | By patient | By collection | Cost |
+|---|---|---|---|
+| Rifampicin | 0.952 | **0.908** | −0.044 |
+| Isoniazid | 0.957 | **0.914** | −0.043 |
+
+CRyPTIC also records each sample's genetic lineage, which let us test *why* it
+happens. The obvious explanation — that samples from one collection are closely
+related — turns out to be **wrong**: holding out entire lineages costs nothing
+(0.954 vs 0.952). The loss falls almost entirely on false alarms rather than
+missed resistance, so on a new collection a "Resistant" call deserves more doubt
+than a "Susceptible" one. See [`RESULTS.md`](RESULTS.md) §4.
+
 ### It's been verified
 
 - Re-scoring 150 samples the model was tested on during training: **150 of 150
@@ -227,6 +245,8 @@ results only, never other software's predictions.
 |---|---|
 | `predict_resistance.py` | **The predictor.** DNA in, answers out. |
 | `prepare_variants.py` | Turns raw DNA changes into a table models can use |
+| `prepare_cryptic.py` | The same, for the CRyPTIC dataset (adds patient IDs and lineage) |
+| `regroup_matrix.py` | Re-splits a prepared table by patient, collection or lineage |
 | `fetch_sample_metadata.py` | Collects sample details from the ENA public database |
 | `fetch_phenotypes.py` | Collects laboratory answers from BV-BRC |
 | `build_phenotype_table.py` | Merges answers from three databases, tracking sources |

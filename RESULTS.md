@@ -21,9 +21,13 @@ it is right about **85 to 90% of the time**. That gap holds for all five drugs,
 and it is the project's main finding: **the standard way of measuring these
 tools flatters them.**
 
+That finding has since been **confirmed on a second, independent dataset
+seventeen times larger** (section 4), which also rules out the most obvious
+explanation for it.
+
 A second question the project set out to answer — whether adding a patient's
 location improves predictions — turned out to be **unanswerable with this
-dataset**, for a reason explained in section 4.
+dataset**, for a reason explained in section 5.
 
 ---
 
@@ -171,7 +175,126 @@ an unfamiliar population.
 
 ---
 
-## 4. The question that cannot be answered
+## 4. Confirmed on a second, much larger dataset
+
+Section 3's finding was measured on one dataset. To check it was not a quirk of
+that data, the whole thing was repeated on the **CRyPTIC consortium** collection
+— a completely separate set of samples, roughly **seventeen times larger**, and
+collected under one shared laboratory protocol rather than 958 different ones.
+
+| | This project's data | CRyPTIC |
+|---|---:|---:|
+| Rifampicin samples with an answer | 2,625 | **45,141** |
+| Isoniazid samples with an answer | 2,603 | **44,880** |
+| Patient identifiers | none | **43,361** |
+| Genetic lineage | not recorded | recorded for 71% |
+
+### The main finding replicates
+
+| Drug | Grouped by patient | **Grouped by collection** | Cost |
+|---|---|---|---|
+| Rifampicin | 0.952 [0.947, 0.956] | **0.908** [0.901, 0.916] | &minus;0.044 |
+| Isoniazid | 0.957 [0.953, 0.961] | **0.914** [0.908, 0.921] | &minus;0.043 |
+
+The original measurement on this project's own data was &minus;0.050 for
+rifampicin and &minus;0.092 for isoniazid. The direction, the rough size and the
+non-overlapping margins of error all hold on independent data seventeen times
+the size. **This is no longer a property of one dataset.**
+
+Note also that CRyPTIC allows a *patient*-grouped split, which this project's
+data cannot support at all. Even with each patient's samples kept together —
+removing one source of flattery entirely — moving to collection-grouping still
+costs the same ~0.04.
+
+### And it rules out the obvious explanation
+
+The natural guess is that samples from one collection are **genetically
+related** — same outbreak, same family of strain — so a model can recognise the
+family rather than the disease. CRyPTIC records each sample's genetic lineage,
+which makes that testable rather than assumed.
+
+Holding out **entire genetic lineages**:
+
+| Drug | Grouped by patient | Grouped by **lineage** | Cost |
+|---|---|---|---|
+| Rifampicin | 0.952 [0.947, 0.956] | 0.954 [0.950, 0.957] | **none** |
+| Isoniazid | 0.957 [0.953, 0.961] | 0.959 [0.955, 0.962] | **none** |
+
+**No penalty at all.** The model can be denied every close genetic relative of
+the samples it is tested on and lose nothing. Whatever the collection effect is,
+**it is not genetic relatedness.**
+
+An earlier draft of this project's write-up offered exactly that explanation.
+It is wrong, and it took having lineage data to find that out.
+
+### What the collection effect actually looks like
+
+The sensitivity and specificity split tells the story:
+
+| Drug | Grouping | Sensitivity | Specificity |
+|---|---|---:|---:|
+| Rifampicin | by patient | 0.934 | 0.802 |
+| Rifampicin | **by collection** | 0.930 | **0.599** |
+| Isoniazid | by patient | 0.944 | 0.820 |
+| Isoniazid | **by collection** | 0.937 | **0.659** |
+
+**Sensitivity barely moves. Specificity collapses.**
+
+On a collection it has never seen, the model still finds nearly every resistant
+sample — it has genuinely learned the resistance mutations. What breaks is false
+alarms: it flags far more susceptible samples as resistant.
+
+That is the signature of a model that has learned each collection's background —
+which harmless mutations are common there — and uses their absence as evidence
+of susceptibility. At a new collection those background cues are wrong, so
+susceptible samples start looking suspicious.
+
+**Practical consequence:** on a new site, trust a "Resistant" call less than the
+headline accuracy suggests, and trust a "Susceptible" call about as much.
+
+### A second, independent check agrees
+
+The lineage test says the model does not lean on genetic family. Asking the
+model directly which mutations it depends on says the same thing, by a different
+route.
+
+CRyPTIC names its mutations, so the answer is readable:
+
+| Mutation | How much the model depends on it |
+|---|---:|
+| **rpoB@S450L** | **0.0732** |
+| embB@M306V | 0.0108 |
+| katG@S315T | 0.0103 |
+| embB@M306I | 0.0066 |
+| rpoB@H445Y | 0.0059 |
+| rpoB@D435V | 0.0054 |
+| whiB6@-74_indel | 0.0042 |
+| rpoB@H445D | 0.0040 |
+| gyrA@E21Q | 0.0034 |
+| mmpL5@I948V | 0.0033 |
+
+Three things to read here:
+
+- **rpoB S450L dominates at roughly seven times the next feature.** That is the
+  single mutation medicine has known causes rifampicin resistance for decades,
+  and the model found it unaided. Four of the top eight are rpoB mutations, all
+  clustered in the same small region of that gene.
+- **katG S315T and embB M306V rank high but are isoniazid and ethambutol
+  mutations**, not rifampicin ones. That is not confusion: strains resistant to
+  one first-line drug are often resistant to several, so carrying the isoniazid
+  mutation genuinely predicts rifampicin resistance. It is a real correlation,
+  but it is co-resistance rather than cause, and a model leaning on it would
+  mispredict an unusual strain resistant to only one drug.
+- **The lineage markers score near the bottom.** `gyrA@E21Q` and
+  `mmpL5@I948V` are carried by roughly 37,000 of the 45,141 samples and mark
+  genetic family rather than resistance. The model depends on them about twenty
+  times less than on rpoB S450L. Two separate methods — holding lineages out,
+  and asking the model what it uses — agree that phylogeny is not what is
+  driving the score.
+
+---
+
+## 5. The question that cannot be answered
 
 The project's original plan was to add each patient's **country and clinical
 details** on top of the DNA and show the combination does better.
@@ -222,7 +345,7 @@ with their data instead.
 
 ---
 
-## 5. The tool did learn real biology
+## 6. The tool did learn real biology
 
 This is the strongest evidence the pipeline is built correctly.
 
@@ -233,12 +356,17 @@ The next most important are likewise the known isoniazid mutations.
 
 Nobody told it where to look. It found them from raw position numbers.
 
+On the CRyPTIC data the same check is far sharper, because mutations there carry
+their proper names: rpoB S450L comes out **seven times** more important than
+anything else, and four of the top eight are mutations in the same small region
+of rpoB. Section 4 has the full table and the caveat about co-resistance.
+
 So it is not purely recognising hospitals. It found the right answer for the
 right reason.
 
 ---
 
-## 6. What to claim
+## 7. What to claim
 
 **Don't claim:** *"We added location data and beat the benchmark."* The data
 cannot support it.
@@ -252,8 +380,14 @@ contradicted by three others.
 > isoniazid) using laboratory answers we recovered ourselves. We then showed
 > that the standard testing method overstates accuracy by 0.05 to 0.15 across
 > five drugs, because samples from the same collection appear on both sides of
-> the test. Faulty answers are ruled out: two independent sources agree on 100%
-> of 323 shared results. We also showed this dataset cannot test whether
+> the test. We confirmed this on the CRyPTIC collection — independent data,
+> seventeen times larger — where the same effect measures 0.043 to 0.044 for
+> both drugs tested. Using CRyPTIC's lineage records we ruled out genetic
+> relatedness as the cause: holding out entire lineages costs nothing. The loss
+> falls almost entirely on specificity rather than sensitivity, meaning the
+> model still finds resistance on an unfamiliar collection but raises far more
+> false alarms. Faulty answers are ruled out: two independent sources agree on
+> 100% of 323 shared results. We also showed this dataset cannot test whether
 > location helps, because location and collection are the same variable within
 > it.
 
@@ -261,7 +395,7 @@ Every clause there has a margin of error behind it.
 
 ---
 
-## 7. Honest limitations
+## 8. Honest limitations
 
 1. **Scores are not probabilities.** 0.80 does not mean an 80% chance. Use them
    as rankings.
@@ -283,7 +417,7 @@ Every clause there has a margin of error behind it.
 
 ---
 
-## 8. Reproducing this
+## 9. Reproducing this
 
 ```bat
 :: 1. turn the raw DNA file into a table the model can use
@@ -311,7 +445,7 @@ The commands above rebuild them in a few minutes each.
 
 ---
 
-## 9. What to do next
+## 10. What to do next
 
 1. **Get more answers.** 27% coverage is the single biggest constraint; more
    would narrow every margin of error here.

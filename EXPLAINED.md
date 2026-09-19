@@ -258,6 +258,70 @@ easier question than the one that matters in practice.
 
 This is the project's strongest finding. **Plan around the middle column.**
 
+## 7b. We checked this on a second, much bigger dataset
+
+A finding measured once could be a quirk of the data. So the whole test was
+repeated on a completely different collection of samples — the **CRyPTIC**
+dataset, about **seventeen times larger** (45,141 samples instead of 2,625).
+
+**Same result.** Splitting by hospital instead of randomly cost 0.044 for
+rifampicin and 0.043 for isoniazid, against 0.050 and 0.092 the first time. The
+effect is real, not a fluke of one dataset.
+
+### And it killed our explanation
+
+We had assumed the model recognises hospitals because **samples from one
+hospital are genetically related** — same outbreak, same family of bacteria. It
+is the obvious guess.
+
+The CRyPTIC data records each sample's genetic family, so we could test it
+properly: train the model with **every close relative removed**, then test.
+
+If relatedness were the answer, the score should have dropped. **It didn't
+move at all** — 0.954 against 0.952. Same for isoniazid.
+
+So that explanation is wrong, and we only found out by measuring it.
+
+### What is actually going on
+
+The clue is in *which* kind of mistake increases. On an unfamiliar hospital:
+
+- **Catching resistance stays fine** — 0.934 to 0.930, barely changed
+- **False alarms jump** — correct "this is fine" calls fall from 0.802 to 0.599
+
+So the model has genuinely learned the resistance mutations. What it also
+learned is each hospital's normal background — which *harmless* mutations are
+common there — and it uses "none of the usual harmless stuff" as evidence that a
+sample is fine. At a new hospital the usual background is different, so healthy
+samples start looking suspicious.
+
+**What this means if you use it:** at a new hospital, a "Resistant" result
+deserves more doubt than the headline number suggests. A "Susceptible" result is
+about as trustworthy as advertised.
+
+### One more check, and it agrees
+
+We also just asked the model directly: *which DNA changes are you actually
+using?* The CRyPTIC data labels its mutations with proper names, so the answer
+is readable.
+
+Top of the list, by a factor of **seven**, is the single mutation that medicine
+has known causes rifampicin resistance for decades. Four of its top eight are
+changes in the same small stretch of that one gene.
+
+Meanwhile the changes that merely mark a bacterium's family tree — carried by
+about 37,000 of the 45,000 samples — sit near the bottom, twenty times less
+important.
+
+So two completely different checks agree: the model is using real biology, not
+family resemblance.
+
+One honest wrinkle: two mutations high on its list actually cause resistance to
+*other* drugs. That is not a mistake — bacteria resistant to one first-line drug
+are usually resistant to several, so those mutations genuinely do predict
+rifampicin resistance. But it is guilt by association rather than cause, and it
+would mislead the model on an unusual strain resistant to only one drug.
+
 ## 8. Something we got wrong, and corrected
 
 We then tried something harder still: remove an entire *country* from training,
