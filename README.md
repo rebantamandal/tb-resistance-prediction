@@ -24,6 +24,11 @@ ERR038266    Susceptible      0.0592            Susceptible     0.1320
 > antibiotic treatment. Culture-based drug susceptibility testing remains the
 > reference standard.
 
+> **New to this, or not from a biology background?** Read
+> **[`EXPLAINED.md`](EXPLAINED.md)** — the whole project in plain English, with
+> no jargon: what the tool does, how to read its output, and what the results
+> mean.
+
 ---
 
 ## Why this exists
@@ -240,7 +245,8 @@ what limits the numbers above.
 | `data/sample_metadata.csv` | ENA metadata for all 9,842 accessions. |
 | `data/variant_panel/feature_dictionary.csv` | Every feature's position, alleles and gene. |
 
-Documentation: [`USAGE.md`](USAGE.md) (day-to-day use) ·
+Documentation: [`EXPLAINED.md`](EXPLAINED.md) (plain-English guide, start here) ·
+[`USAGE.md`](USAGE.md) (day-to-day use) ·
 [`RESULTS.md`](RESULTS.md) (what was measured and how) ·
 [`DATA_PIPELINE.md`](DATA_PIPELINE.md) (how the data was assembled) ·
 [`TESTING.md`](TESTING.md).

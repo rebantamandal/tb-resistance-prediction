@@ -3,6 +3,9 @@
 **Research use only.** The models are not clinically validated and the scores are
 uncalibrated. Do not use output to start, stop or change antibiotic treatment.
 
+> Looking for a plain-English explanation with no jargon? See
+> [`EXPLAINED.md`](EXPLAINED.md).
+
 ## The one command
 
 ```bat
