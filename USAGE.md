@@ -11,6 +11,24 @@ New to the project entirely? Read [`EXPLAINED.md`](EXPLAINED.md) first.
 
 ---
 
+## The browser version
+
+If you would rather not use the command line:
+
+```bat
+.venv\Scripts\python predict_app.py
+```
+
+A page opens at `http://127.0.0.1:8777/`. Drop a CSV onto it, or press **Use the
+example file** to see it work first. Results appear as a table you can download.
+
+It marks anything scoring between 0.40 and 0.60 as **Uncertain** rather than
+forcing it into Resistant or Susceptible, which the CSV output does not do for
+you.
+
+The server only accepts connections from your own machine, and nothing is
+uploaded anywhere.
+
 ## The command
 
 ```bat

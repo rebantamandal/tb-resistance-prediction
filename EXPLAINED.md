@@ -109,6 +109,12 @@ easy.
 
 ## 4. Running it
 
+**The easy way — in a browser.** Run `python predict_app.py`, a page opens, drop
+your file on it. No commands to remember, and it highlights the results the tool
+is unsure about.
+
+**The command-line way:**
+
 ```bat
 .venv\Scripts\python predict_resistance.py ^
   --variants examples\sample_isolates.csv ^

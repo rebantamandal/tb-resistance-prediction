@@ -58,7 +58,17 @@ python -m venv .venv
 The trained models are included, so you can predict straight away. **No large
 download needed.**
 
-### Try it now
+### Prefer a browser? No command line needed
+
+```bash
+.venv/Scripts/python predict_app.py
+```
+
+A page opens. Drop a CSV in, get a table back, download the results. There is a
+button to run the built-in example if you just want to see it work. The server
+is local-only and nothing leaves your machine.
+
+### Or use the command line
 
 A ready-made example ships with the repo:
 
@@ -209,6 +219,7 @@ results only, never other software's predictions.
 | [`USAGE.md`](USAGE.md) | Day-to-day reference: commands, formats, troubleshooting |
 | [`RESULTS.md`](RESULTS.md) | Every number, with margins of error |
 | [`examples/`](examples/) | A file you can run immediately |
+| [`DATASETS.md`](DATASETS.md) | Other datasets that would take this project further |
 
 **The tools**
 
@@ -223,7 +234,8 @@ results only, never other software's predictions.
 | `geographic_sweep.py` | Tests each country separately |
 | `analyze_runs.py` | Calculates margins of error |
 | `amr.py` | The underlying model trainer |
-| `app.py` | Optional browser interface, if you'd rather not use the command line |
+| `predict_app.py` | **Browser interface** for predicting — no command line needed |
+| `app.py` | Older browser interface for *training*, inherited from the starter |
 
 **The data that ships with it**
 
